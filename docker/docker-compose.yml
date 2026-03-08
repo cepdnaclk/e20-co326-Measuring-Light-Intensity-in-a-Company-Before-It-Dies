@@ -1,4 +1,13 @@
 services:
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: mosquitto
+    ports:
+      - "1883:1883"
+    networks:
+      - iot_network
+
   influxdb:
     image: influxdb:2.7
     container_name: influxdb
@@ -31,12 +40,12 @@ services:
   node-red:
     image: nodered/node-red:latest
     container_name: node-red
-    environment:
-      - FLOWS_FILE=/data/flows.json
     volumes:
       - ./node-red/data:/data
     ports:
       - "1880:1880"
+    depends_on:
+      - mosquitto
     networks:
       - iot_network
 

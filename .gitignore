@@ -1,0 +1,7 @@
+# Local firmware credentials
+edge-logic/firmware/tinyml_light_monitor/credentials.h
+
+# Node dependencies
+node_modules/
+**/node_modules/
+.npm/
