@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import mqtt from "mqtt";
 
 const app = express();
 app.use(cors());
@@ -7,6 +8,11 @@ app.use(express.json());
 
 const PORT = process.env.PORT || 4000;
 const TICK_SECONDS = 0.5;
+const MQTT_URL = process.env.MQTT_URL || "mqtt://localhost:1883";
+const MQTT_TOPIC = process.env.MQTT_TOPIC || "led/simulator/sensors";
+const MQTT_CLIENT_ID =
+  process.env.MQTT_CLIENT_ID || `led-simulator-${Math.random().toString(16).slice(2, 10)}`;
+const MQTT_ENABLED = (process.env.MQTT_ENABLED || "true").toLowerCase() !== "false";
 const HEALTHY_DEFAULTS = {
   ambientTemp: 25,
   humidity: 45,
@@ -59,9 +65,74 @@ const state = {
 };
 
 const history = [];
+let mqttClient = null;
+let mqttConnected = false;
 
 const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
 const noise = (v, ratio = 0.03) => v + (Math.random() - 0.5) * 2 * v * ratio;
+
+function initMqtt() {
+  if (!MQTT_ENABLED) {
+    console.log("MQTT publishing disabled (MQTT_ENABLED=false).");
+    return;
+  }
+
+  mqttClient = mqtt.connect(MQTT_URL, {
+    clientId: MQTT_CLIENT_ID,
+    reconnectPeriod: 2000,
+    connectTimeout: 5000,
+  });
+
+  mqttClient.on("connect", () => {
+    mqttConnected = true;
+    console.log(`Connected to MQTT broker: ${MQTT_URL}`);
+  });
+
+  mqttClient.on("reconnect", () => {
+    mqttConnected = false;
+  });
+
+  mqttClient.on("close", () => {
+    mqttConnected = false;
+  });
+
+  mqttClient.on("error", (err) => {
+    mqttConnected = false;
+    console.warn(`MQTT error: ${err.message}`);
+  });
+}
+
+function publishSensorSample() {
+  if (!mqttClient || !mqttConnected) return;
+
+  const payload = {
+    timestamp: new Date().toISOString(),
+    sim: {
+      timeHours: Number(state.timeHours.toFixed(2)),
+      speed: state.speed,
+      playing: state.playing,
+    },
+    environment: {
+      ambientTemp: state.ambientTemp,
+      humidity: state.humidity,
+      driveCurrent: state.driveCurrent,
+    },
+    sensors: {
+      tcs34725: state.sensors.rgb,
+      ldrAdc: state.sensors.ldr,
+      ripplePercent: state.sensors.ripplePercent,
+    },
+    derived: state.derived,
+    adc: state.adc,
+    anomalies: state.anomalies,
+  };
+
+  mqttClient.publish(MQTT_TOPIC, JSON.stringify(payload), { qos: 0, retain: false }, (err) => {
+    if (err) {
+      console.warn(`Failed to publish MQTT sample: ${err.message}`);
+    }
+  });
+}
 
 function applyInitialValues(resetTime = true) {
   state.ambientTemp = state.initialValues.ambientTemp;
@@ -150,9 +221,12 @@ function simulate() {
     ripplePercent: state.sensors.ripplePercent,
   });
   if (history.length > 120) history.shift();
+
+  publishSensorSample();
 }
 
 setInterval(simulate, TICK_SECONDS * 1000);
+initMqtt();
 
 app.get("/api/state", (_req, res) => {
   res.json({ ...state, history });
@@ -240,4 +314,7 @@ app.post("/api/initial-values", (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Simulator API running on http://localhost:${PORT}`);
+  if (MQTT_ENABLED) {
+    console.log(`Publishing sensor samples to MQTT topic: ${MQTT_TOPIC}`);
+  }
 });
