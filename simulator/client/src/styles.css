@@ -7,6 +7,59 @@
   --accent2: #fb923c;
   --danger: #ef4444;
   --ok: #22c55e;
+  --text: #d1d5db;
+  --muted: #6b7280;
+  --header: rgba(15, 15, 26, 0.65);
+  --panel: rgba(15, 15, 26, 0.4);
+  --chart-bg: #0b0b17;
+  --chart-border: #1f2037;
+  --grid: #232742;
+  --axis: #3a3f62;
+  --axis-label: #94a3b8;
+  --slider-track-1: #1c1c35;
+  --slider-track-2: #2a2a45;
+  --slider-thumb-border: #08080f;
+  --toggle-bg: #1c1c35;
+  --toggle-knob: #555;
+  --input-bg: #0f1020;
+  --dial-bg: rgba(15, 15, 26, 0.85);
+  --led-bg: rgba(15, 15, 26, 0.85);
+  --dial-track: #25273e;
+  --dial-tick: #333759;
+  --led-base: #59607f;
+  --led-leg: #9ca3af;
+}
+
+:root.theme-light {
+  --bg: #f3f6fb;
+  --card: #ffffff;
+  --card2: #eef2fb;
+  --bdr: #d6deef;
+  --accent: #d97706;
+  --accent2: #ea580c;
+  --danger: #dc2626;
+  --ok: #16a34a;
+  --text: #1f2937;
+  --muted: #64748b;
+  --header: rgba(255, 255, 255, 0.92);
+  --panel: rgba(248, 251, 255, 0.92);
+  --chart-bg: #f8faff;
+  --chart-border: #d8e1f2;
+  --grid: #e3e9f5;
+  --axis: #b8c4dd;
+  --axis-label: #64748b;
+  --slider-track-1: #dbe4f4;
+  --slider-track-2: #c9d6ee;
+  --slider-thumb-border: #e8edf8;
+  --toggle-bg: #cdd7eb;
+  --toggle-knob: #f8fafc;
+  --input-bg: #eef2fb;
+  --dial-bg: #ffffff;
+  --led-bg: #ffffff;
+  --dial-track: #d5deef;
+  --dial-tick: #b8c4dd;
+  --led-base: #a7b2c9;
+  --led-leg: #7d8aa7;
 }
 
 * {
@@ -32,7 +85,8 @@ body {
   margin: 0;
   font-family: "Space Grotesk", "Segoe UI", sans-serif;
   background: var(--bg);
-  color: #d1d5db;
+  color: var(--text);
+  overflow: hidden;
 }
 
 .loading {
@@ -46,12 +100,12 @@ body {
 }
 
 .text-gray {
-  color: #d1d5db;
+  color: var(--text);
 }
 
 .card {
-  background: rgba(15, 15, 26, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: color-mix(in oklab, var(--card) 90%, transparent);
+  border: 1px solid var(--bdr);
   border-radius: 14px;
   backdrop-filter: blur(12px);
   transition: border-color 0.3s;
@@ -62,7 +116,8 @@ body {
 }
 
 .page {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .card-header {
@@ -72,7 +127,8 @@ body {
   justify-content: space-between;
   padding: 0 18px;
   border-bottom: 1px solid var(--bdr);
-  background: rgba(15, 15, 26, 0.65);
+  background: var(--header);
+  position: relative;
 }
 
 .brand {
@@ -93,7 +149,7 @@ body {
 
 .title-sub {
   font-size: 0.72rem;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .dot {
@@ -121,6 +177,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  margin-right: 44px;
 }
 
 .status-pill {
@@ -144,9 +201,9 @@ body {
 }
 
 .status-pill.neutral {
-  color: #93a0bc;
-  border-color: #2c3356;
-  background: #12152b;
+  color: var(--muted);
+  border-color: var(--bdr);
+  background: var(--card2);
 }
 
 .run-btn {
@@ -165,9 +222,32 @@ body {
   background: var(--card2);
   border: 1px solid var(--bdr);
   border-radius: 8px;
-  color: #cbd5e1;
+  color: var(--text);
   height: 34px;
   padding: 0 10px;
+}
+
+.theme-toggle {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--bdr);
+  background: var(--card2);
+  color: var(--text);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.theme-corner {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+}
+
+.theme-icon {
+  font-size: 14px;
+  line-height: 1;
 }
 
 .full-width {
@@ -177,12 +257,13 @@ body {
 .workspace {
   display: grid;
   grid-template-columns: 290px 1fr;
-  min-height: calc(100vh - 56px);
+  height: calc(100vh - 56px);
+  overflow: hidden;
 }
 
 .sidebar {
   border-right: 1px solid var(--bdr);
-  background: rgba(15, 15, 26, 0.4);
+  background: var(--panel);
   padding: 12px;
   overflow-y: auto;
 }
@@ -196,14 +277,14 @@ body {
   font-size: 0.74rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 label {
   display: block;
   font-size: 0.86rem;
   margin-bottom: 10px;
-  color: #d1d5db;
+  color: var(--text);
 }
 
 .inline-value {
@@ -218,7 +299,7 @@ label {
   width: 100%;
   height: 6px;
   border-radius: 3px;
-  background: linear-gradient(90deg, #1c1c35, #2a2a45);
+  background: linear-gradient(90deg, var(--slider-track-1), var(--slider-track-2));
   outline: none;
   cursor: pointer;
 }
@@ -229,7 +310,7 @@ label {
   height: 18px;
   border-radius: 50%;
   background: linear-gradient(135deg, #f59e0b, #fb923c);
-  border: 2px solid #08080f;
+  border: 2px solid var(--slider-thumb-border);
   box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
 }
 
@@ -264,7 +345,7 @@ label {
 .toggle-track {
   position: absolute;
   inset: 0;
-  background: #1c1c35;
+  background: var(--toggle-bg);
   border-radius: 12px;
   transition: 0.3s;
 }
@@ -276,7 +357,7 @@ label {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #555;
+  background: var(--toggle-knob);
   transition: 0.3s;
 }
 
@@ -299,7 +380,7 @@ label {
 
 .mini-label {
   margin-bottom: 6px;
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -307,7 +388,7 @@ label {
 
 .input-label {
   font-size: 0.72rem;
-  color: #8a93ab;
+  color: var(--muted);
   margin: 3px 0;
 }
 
@@ -320,9 +401,9 @@ label {
 
 input[type="number"] {
   width: 100%;
-  background: #0f1020;
-  border: 1px solid #2b2d4e;
-  color: #d1d5db;
+  background: var(--input-bg);
+  border: 1px solid var(--bdr);
+  color: var(--text);
   border-radius: 8px;
   padding: 6px 8px;
   margin-bottom: 6px;
@@ -355,7 +436,7 @@ input[type="number"] {
 
 .formula-note {
   font-size: 0.7rem;
-  color: #7b849f;
+  color: var(--muted);
   margin-bottom: 8px;
 }
 
@@ -372,7 +453,7 @@ input[type="number"] {
 .readout-head {
   display: flex;
   justify-content: space-between;
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.74rem;
   margin-bottom: 6px;
 }
@@ -386,7 +467,7 @@ input[type="number"] {
 }
 
 .readout strong {
-  color: #e5e7eb;
+  color: var(--text);
 }
 
 .main-grid {
@@ -395,6 +476,8 @@ input[type="number"] {
   grid-template-columns: repeat(2, minmax(300px, 1fr));
   gap: 10px;
   align-content: start;
+  height: 100%;
+  overflow: hidden;
 }
 
 .tile {
@@ -410,19 +493,19 @@ input[type="number"] {
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .chart-svg {
   width: 100%;
   height: 220px;
-  background: #0b0b17;
-  border: 1px solid #1f2037;
+  background: var(--chart-bg);
+  border: 1px solid var(--chart-border);
   border-radius: 8px;
 }
 
 .grid-line {
-  stroke: #232742;
+  stroke: var(--grid);
   stroke-width: 1;
 }
 
@@ -431,12 +514,12 @@ input[type="number"] {
 }
 
 .axis-line {
-  stroke: #3a3f62;
+  stroke: var(--axis);
   stroke-width: 1.1;
 }
 
 .axis-text {
-  fill: #6b7280;
+  fill: var(--muted);
   font-size: 9px;
   font-family: "JetBrains Mono", monospace;
 }
@@ -450,7 +533,7 @@ input[type="number"] {
 }
 
 .axis-label {
-  fill: #94a3b8;
+  fill: var(--axis-label);
   font-size: 10px;
   letter-spacing: 0.03em;
 }
@@ -472,8 +555,8 @@ input[type="number"] {
 }
 
 .dial-card {
-  background: rgba(15, 15, 26, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: var(--dial-bg);
+  border: 1px solid var(--bdr);
   border-radius: 14px;
   padding: 10px;
 }
@@ -484,7 +567,7 @@ input[type="number"] {
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 .dial-svg {
@@ -494,7 +577,7 @@ input[type="number"] {
 
 .dial-track {
   fill: none;
-  stroke: #25273e;
+  stroke: var(--dial-track);
   stroke-width: 8;
   stroke-linecap: round;
 }
@@ -507,7 +590,7 @@ input[type="number"] {
 }
 
 .dial-tick {
-  stroke: #333759;
+  stroke: var(--dial-tick);
   stroke-width: 1;
 }
 
@@ -519,8 +602,8 @@ input[type="number"] {
 }
 
 .led-card {
-  background: rgba(15, 15, 26, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  background: var(--led-bg);
+  border: 1px solid var(--bdr);
   border-radius: 14px;
   padding: 10px;
 }
@@ -538,7 +621,7 @@ input[type="number"] {
   width: 120px;
   height: 90px;
   border-radius: 50%;
-  filter: blur(4px);
+  filter: blur(6px);
 }
 
 .led-bulb {
@@ -550,11 +633,15 @@ input[type="number"] {
   z-index: 2;
 }
 
+:root.theme-light .led-bulb {
+  border: 1px solid rgba(15, 23, 42, 0.25);
+}
+
 .led-base-top {
   position: absolute;
   width: 18px;
   height: 7px;
-  background: #59607f;
+  background: var(--led-base);
   top: 70px;
   border-radius: 2px;
   z-index: 2;
@@ -564,7 +651,7 @@ input[type="number"] {
   position: absolute;
   width: 2px;
   height: 12px;
-  background: #9ca3af;
+  background: var(--led-leg);
   top: 77px;
   z-index: 1;
 }

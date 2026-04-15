@@ -200,16 +200,20 @@ function DialGauge({ title, value, min, max, unit = "", colorScheme = "red-yello
   );
 }
 
-function LedBulb({ r, g, b, intensity }) {
+function LedBulb({ r, g, b, intensity, theme }) {
   const safeIntensity = Math.max(0.08, Math.min(1, intensity));
-  const glowOpacity = 0.35 + safeIntensity * 0.45;
+  const glowOpacity = theme === "light" ? 0.55 + safeIntensity * 0.6 : 0.35 + safeIntensity * 0.45;
   const bulbColor = `rgba(${r}, ${g}, ${b}, ${0.55 + safeIntensity * 0.4})`;
   const glowColor = `rgba(${r}, ${g}, ${b}, ${glowOpacity})`;
+  const stageBg =
+    theme === "light"
+      ? "radial-gradient(circle, rgba(15,23,42,0.09) 0%, rgba(15,23,42,0.03) 45%, rgba(15,23,42,0) 75%)"
+      : "transparent";
 
   return (
     <div className="led-card">
       <div className="dial-title">LED Output</div>
-      <div className="led-stage">
+      <div className="led-stage" style={{ background: stageBg }}>
         <div className="led-glow" style={{ background: `radial-gradient(circle, ${glowColor} 0%, rgba(0,0,0,0) 70%)` }} />
         <div
           className="led-bulb"
@@ -229,6 +233,7 @@ function LedBulb({ r, g, b, intensity }) {
 export default function App() {
   const [sim, setSim] = useState(null);
   const [now, setNow] = useState(new Date());
+  const [theme, setTheme] = useState(() => localStorage.getItem("sim-theme") || "dark");
   const [control, setControl] = useState({
     speed: 1,
     ambientTemp: 25,
@@ -287,6 +292,16 @@ export default function App() {
       clearInterval(clockId);
     };
   }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === "light") {
+      root.classList.add("theme-light");
+    } else {
+      root.classList.remove("theme-light");
+    }
+    localStorage.setItem("sim-theme", theme);
+  }, [theme]);
 
   if (!sim) return <div className="loading">Loading simulator...</div>;
 
@@ -411,6 +426,15 @@ export default function App() {
             <option value={6}>6x</option>
           </select>
         </div>
+        <button
+          type="button"
+          className="theme-toggle theme-corner"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+        >
+          <span className="theme-icon" aria-hidden="true">{theme === "dark" ? "☀" : "🌙"}</span>
+        </button>
       </header>
 
       <div className="workspace">
@@ -691,7 +715,7 @@ export default function App() {
             <DialGauge title="RUL" value={sim.derived?.rulHours ?? 0} min={0} max={Math.max(1000, rulModel.baseLifeHours)} unit="h" colorScheme="red-yellow-green" />
             <DialGauge title="LDR ADC" value={sim.sensors.ldr} min={0} max={4095} colorScheme="dark-yellow" />
             <DialGauge title="Junction" value={junctionTemp} min={0} max={150} unit="°C" colorScheme="green-yellow-red" />
-            <LedBulb r={displayR} g={displayG} b={displayB} intensity={rgbIntensity} />
+            <LedBulb r={displayR} g={displayG} b={displayB} intensity={rgbIntensity} theme={theme} />
           </section>
         </main>
       </div>
