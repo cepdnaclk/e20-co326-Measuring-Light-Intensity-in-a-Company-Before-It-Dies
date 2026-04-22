@@ -97,7 +97,7 @@
         "rap": true,
         "rh": 0,
         "inputs": 0,
-        "x": 260,
+        "x": 240,
         "y": 180,
         "wires": [
             [
@@ -117,7 +117,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 450,
+        "x": 410,
         "y": 180,
         "wires": [
             [
@@ -138,8 +138,8 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 600,
-        "y": 280,
+        "x": 680,
+        "y": 140,
         "wires": []
     },
     {
@@ -155,11 +155,12 @@
         "rap": true,
         "rh": 0,
         "inputs": 0,
-        "x": 290,
+        "x": 250,
         "y": 320,
         "wires": [
             [
-                "f1a9f6b34fbe4e2d"
+                "f1a9f6b34fbe4e2d",
+                "8349cce1af2e3775"
             ]
         ]
     },
@@ -175,7 +176,7 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 520,
+        "x": 470,
         "y": 320,
         "wires": [
             [
@@ -197,8 +198,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 760,
-        "y": 360,
+        "x": 700,
+        "y": 400,
         "wires": []
     },
     {
@@ -215,8 +216,24 @@
         "retentionPolicyV18Flux": "",
         "org": "light_org",
         "bucket": "light_data",
-        "x": 630,
-        "y": 180,
+        "x": 670,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "8349cce1af2e3775",
+        "type": "debug",
+        "z": "fde217c77fb16fbe",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 400,
+        "y": 420,
         "wires": []
     }
 ]
