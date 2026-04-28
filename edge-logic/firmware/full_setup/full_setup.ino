@@ -60,22 +60,22 @@ void loop()
 	client.loop();
 
 	int ldrValue = analogRead(ldrPin);
-	const char *status = "NORMAL";
+	const char *status = "BRIGHT";
 
 	if (ldrValue >= 3000)
 	{
 		digitalWrite(relayBackup, HIGH);
-		status = "NORMAL";
+		status = "BRIGHT";
 	}
 	else if (ldrValue >= 1000)
 	{
 		digitalWrite(relayBackup, LOW);
-		status = "DEGRADING";
+		status = "NORMAL";
 	}
 	else
 	{
 		digitalWrite(relayBackup, LOW);
-		status = "FAILED / VERY LOW";
+		status = "DARK";
 	}
 
 	Serial.print("LDR Value: ");
