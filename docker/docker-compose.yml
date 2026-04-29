@@ -37,8 +37,39 @@ services:
     networks:
       - iot_network
 
+  simulator-server:
+    build:
+      context: ../simulator
+      dockerfile: server/Dockerfile
+    image: simulator-server
+    container_name: simulator-server
+    ports:
+      - "4000:4000"
+    environment:
+      - MQTT_URL=mqtt://mosquitto:1883
+      - MQTT_ENABLED=true
+    depends_on:
+      - mosquitto
+    networks:
+      - iot_network
+
+  simulator-client:
+    build:
+      context: ../simulator
+      dockerfile: client/Dockerfile
+    image: simulator-client
+    container_name: simulator-client
+    ports:
+      - "5173:80"
+    depends_on:
+      - simulator-server
+    networks:
+      - iot_network
+
   node-red:
-    image: nodered/node-red:latest
+    build:
+      context: ./node-red
+    image: nodered-custom
     container_name: node-red
     volumes:
       - ./node-red/data:/data

@@ -10,27 +10,78 @@ This project uses Docker Compose to run the monitoring stack:
 
 - Docker Desktop installed and running
 - Docker Compose plugin available (`docker compose`)
+- On Linux, you may need either:
+  - run Docker commands with `sudo`, or
+  - add your user to the `docker` group so `docker compose` can access `/var/run/docker.sock`
 
 ## How to Run the Containers
+
+### Production mode
 
 1. Open a terminal in the project root.
 2. Move to the `docker` folder:
 
-   ```powershell
+   ```bash
    cd docker
    ```
 
 3. Start all containers in detached mode:
 
-   ```powershell
-   docker compose up -d
+   ```bash
+   docker compose up -d --build
    ```
 
 4. Verify running containers:
 
-   ```powershell
+   ```bash
    docker compose ps
    ```
+
+5. The production simulator UI is served on `http://localhost:5173`.
+
+### Development mode
+
+1. Open a terminal in the project root.
+2. Move to the `docker` folder:
+
+   ```bash
+   cd docker
+   ```
+
+3. Start the stack with the development override:
+
+   ```bash
+   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+   ```
+
+4. Verify running containers:
+
+   ```bash
+   docker compose -f docker-compose.yml -f docker-compose.dev.yml ps
+   ```
+
+5. The simulator UI dev server runs on `http://localhost:5174/`.
+
+6. Edit simulator UI or server files in `simulator/client` or `simulator/server`; the dev services mount the source code and will reflect changes without rebuilding the container.
+
+### Promote confirmed changes to production
+
+After you verify your changes in development mode, rebuild and restart the production stack so the production containers use the updated source files:
+
+```bash
+cd docker
+docker compose -f docker-compose.yml build simulator-client simulator-server
+docker compose -f docker-compose.yml up -d
+```
+
+Or run the full production rebuild:
+
+```bash
+cd docker
+docker compose up -d --build
+```
+
+The production UI will then serve the updated app from `http://localhost:5173`.
 
 ## Service URLs
 
@@ -43,6 +94,9 @@ This project uses Docker Compose to run the monitoring stack:
   - Password: `rootpassword`
   - Organization: `light_org`
   - Bucket: `light_data`
+- Simulator server API: http://localhost:4000
+- Simulator UI (production): http://localhost:5173
+- Simulator UI (development): http://localhost:5174
 
 ## Useful Commands
 
