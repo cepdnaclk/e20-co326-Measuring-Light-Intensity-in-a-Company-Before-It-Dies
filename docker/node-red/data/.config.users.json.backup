@@ -6,7 +6,7 @@
                 "view-store-position": false,
                 "view-show-grid": true,
                 "view-snap-grid": true,
-                "view-grid-size": 20,
+                "view-grid-size": "20",
                 "view-node-status": true,
                 "view-node-info-icon": true,
                 "view-node-show-label": true,
@@ -17,6 +17,14 @@
                 "welcome": "4.1.6"
             }
         },
-        "menu-menu-item-sidebar": true
+        "menu-menu-item-sidebar": true,
+        "debug": {
+            "filter": "filterAll",
+            "filteredNodes": [
+                "37ce0f544afd4181",
+                "8349cce1af2e3775",
+                "a6d26a57e9fa7e13"
+            ]
+        }
     }
 }

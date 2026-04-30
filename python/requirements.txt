@@ -1,0 +1,32 @@
+# requirements.txt
+# =================
+# Python dependencies for the Edge AI service.
+#
+# Core ML:
+#   - xgboost, scikit-learn: failure prediction & fault classification
+#   - numpy, pandas: data processing
+#   - scipy: statistical functions
+#   - joblib: model serialisation
+#
+# API:
+#   - fastapi, uvicorn: REST API server
+#   - pydantic: request/response validation
+#
+# Infrastructure:
+#   - paho-mqtt: MQTT client for subscribing and publishing
+#   - influxdb-client: InfluxDB 2.x queries
+#
+# Note: TensorFlow is NOT needed here — it runs on the ESP32 via
+# TFLite Micro.  The Python service uses XGBoost only.
+
+fastapi==0.115.0
+uvicorn==0.30.0
+pydantic==2.9.0
+paho-mqtt==2.1.0
+numpy==1.26.4
+pandas==2.2.2
+scikit-learn==1.5.1
+xgboost==2.1.0
+scipy==1.14.0
+joblib==1.4.2
+influxdb-client==1.44.0

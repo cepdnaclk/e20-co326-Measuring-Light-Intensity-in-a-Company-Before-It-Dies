@@ -1,4 +1,10 @@
-import { DEFAULT_INSTANCE_ID, HEALTHY_DEFAULTS, MAX_HISTORY, MQTT_TOPIC, TICK_SECONDS } from "../config.js";
+import {
+  DEFAULT_INSTANCE_ID,
+  HEALTHY_DEFAULTS,
+  MAX_HISTORY,
+  MQTT_TOPIC,
+  TICK_SECONDS,
+} from "../config.js";
 import { clamp, noise } from "../utils/math.js";
 import { sanitizePathSegment } from "../utils/path.js";
 
@@ -17,21 +23,37 @@ export function createLampState(instanceId, overrides = {}, options = {}) {
   const topicBase = overrides.topicBase || buildTopicBase(location, instanceId);
   const defaultTopic = `${topicBase}/telemetry/raw`;
 
-  const initialSpeed = typeof overrides.speed === "number" ? overrides.speed : HEALTHY_DEFAULTS.speed;
+  const initialSpeed =
+    typeof overrides.speed === "number"
+      ? overrides.speed
+      : HEALTHY_DEFAULTS.speed;
   const initialAmbientTemp =
-    typeof overrides.ambientTemp === "number" ? overrides.ambientTemp : HEALTHY_DEFAULTS.ambientTemp;
+    typeof overrides.ambientTemp === "number"
+      ? overrides.ambientTemp
+      : HEALTHY_DEFAULTS.ambientTemp;
   const initialHumidity =
-    typeof overrides.humidity === "number" ? overrides.humidity : HEALTHY_DEFAULTS.humidity;
+    typeof overrides.humidity === "number"
+      ? overrides.humidity
+      : HEALTHY_DEFAULTS.humidity;
   const initialDriveCurrent =
-    typeof overrides.driveCurrent === "number" ? overrides.driveCurrent : HEALTHY_DEFAULTS.driveCurrent;
+    typeof overrides.driveCurrent === "number"
+      ? overrides.driveCurrent
+      : HEALTHY_DEFAULTS.driveCurrent;
   const initialAdcBits =
-    typeof overrides.adcBits === "number" ? (overrides.adcBits >= 12 ? 12 : 10) : HEALTHY_DEFAULTS.adcBits;
+    typeof overrides.adcBits === "number"
+      ? overrides.adcBits >= 12
+        ? 12
+        : 10
+      : HEALTHY_DEFAULTS.adcBits;
 
   return {
     id: instanceId,
     playing: !!overrides.playing,
-    speed: clamp(initialSpeed, 0.25, 8),
-    timeHours: typeof overrides.timeHours === "number" ? Math.max(0, overrides.timeHours) : 0,
+    speed: clamp(initialSpeed, 0.25, 30),
+    timeHours:
+      typeof overrides.timeHours === "number"
+        ? Math.max(0, overrides.timeHours)
+        : 0,
     ambientTemp: clamp(initialAmbientTemp, -10, 100),
     humidity: clamp(initialHumidity, 0, 100),
     driveCurrent: clamp(initialDriveCurrent, 50, 700),
@@ -56,7 +78,7 @@ export function createLampState(instanceId, overrides = {}, options = {}) {
       ambientTemp: clamp(initialAmbientTemp, -10, 100),
       humidity: clamp(initialHumidity, 0, 100),
       driveCurrent: clamp(initialDriveCurrent, 50, 700),
-      speed: clamp(initialSpeed, 0.25, 8),
+      speed: clamp(initialSpeed, 0.25, 30),
       adcBits: initialAdcBits,
     },
     rulModel: {
@@ -77,7 +99,10 @@ export function createLampState(instanceId, overrides = {}, options = {}) {
 }
 
 export function initDefaultInstance() {
-  instances.set(DEFAULT_INSTANCE_ID, createLampState(DEFAULT_INSTANCE_ID, {}, { isDefault: true }));
+  instances.set(
+    DEFAULT_INSTANCE_ID,
+    createLampState(DEFAULT_INSTANCE_ID, {}, { isDefault: true }),
+  );
 }
 
 export const getInstancesMap = () => instances;
@@ -121,22 +146,43 @@ export function simulateInstance(instance, publishFn) {
   const baseR = clamp(noise(255 * safeIntensity * 1.0), 0, 1023);
   const baseG = clamp(noise(240 * safeIntensity * 0.95), 0, 1023);
   const baseB = clamp(noise(225 * safeIntensity * 0.9), 0, 1023);
+  const ldrDecay = Math.exp(-0.00008 * instance.timeHours);
   const baseLdr = clamp(
-    noise((adcMax * Math.log10(1 + safeIntensity * 9)) / Math.log10(10), 0.02),
+    noise(
+      ((adcMax * Math.log10(1 + safeIntensity * 9)) / Math.log10(10)) *
+        ldrDecay,
+      0.02,
+    ),
     0,
-    adcMax
+    adcMax,
   );
   const baseRipple = clamp(
-    noise((1 + instance.timeHours * 0.0001 + (instance.driveCurrent - 350) * 0.0005) * 1.6, 0.1),
+    noise(
+      (1 +
+        instance.timeHours * 0.0001 +
+        (instance.driveCurrent - 350) * 0.0005) *
+        1.6,
+      0.1,
+    ),
     0.2,
-    45
+    45,
   );
 
-  const finalR = instance.anomalies.rgb.enabled ? instance.anomalies.rgb.r : baseR;
-  const finalG = instance.anomalies.rgb.enabled ? instance.anomalies.rgb.g : baseG;
-  const finalB = instance.anomalies.rgb.enabled ? instance.anomalies.rgb.b : baseB;
-  const finalLdr = instance.anomalies.ldr.enabled ? instance.anomalies.ldr.value : baseLdr;
-  const finalRipple = instance.anomalies.ripple.enabled ? instance.anomalies.ripple.value : baseRipple;
+  const finalR = instance.anomalies.rgb.enabled
+    ? instance.anomalies.rgb.r
+    : baseR;
+  const finalG = instance.anomalies.rgb.enabled
+    ? instance.anomalies.rgb.g
+    : baseG;
+  const finalB = instance.anomalies.rgb.enabled
+    ? instance.anomalies.rgb.b
+    : baseB;
+  const finalLdr = instance.anomalies.ldr.enabled
+    ? instance.anomalies.ldr.value
+    : baseLdr;
+  const finalRipple = instance.anomalies.ripple.enabled
+    ? instance.anomalies.ripple.value
+    : baseRipple;
 
   instance.sensors.rgb = {
     R: Math.round(finalR),

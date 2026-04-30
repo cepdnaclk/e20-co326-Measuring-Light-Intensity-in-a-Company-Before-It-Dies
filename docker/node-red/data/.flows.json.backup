@@ -147,8 +147,8 @@
         "type": "mqtt in",
         "z": "fde217c77fb16fbe",
         "name": "Simulator In",
-        "topic": "led/simulator/sensors",
-        "qos": "0",
+        "topic": "factory/+/+/+/+/+/telemetry/raw",
+        "qos": "2",
         "datatype": "auto-detect",
         "broker": "0e0d7c63c7290efa",
         "nl": false,
@@ -169,7 +169,7 @@
         "type": "function",
         "z": "fde217c77fb16fbe",
         "name": "Parse Simulator Payload",
-        "func": "let data = msg.payload;\nif (typeof data === \"string\") {\n    try {\n        data = JSON.parse(data);\n    } catch (e) {\n        node.warn(\"Simulator payload is not valid JSON\");\n        return null;\n    }\n}\n\nif (!data || typeof data !== \"object\") {\n    return null;\n}\n\nmsg.payload = {\n    ldr: Number(data?.sensors?.ldrAdc ?? data?.sensors?.ldr ?? 0),\n    ripple_percent: Number(data?.sensors?.ripplePercent ?? 0),\n    rgb_r: Number(data?.sensors?.tcs34725?.R ?? 0),\n    rgb_g: Number(data?.sensors?.tcs34725?.G ?? 0),\n    rgb_b: Number(data?.sensors?.tcs34725?.B ?? 0),\n    source: \"simulated\"\n};\n\nreturn msg;",
+        "func": "let data = msg.payload;\nif (typeof data === \"string\") {\n    try {\n        data = JSON.parse(data);\n    } catch (e) {\n        node.warn(\"Simulator payload is not valid JSON\");\n        return null;\n    }\n}\n\nif (!data || typeof data !== \"object\") {\n    return null;\n}\n\nconst topicParts = String(msg.topic || \"\").split(\"/\");\nconst topicSite = topicParts[1] || \"sitea\";\nconst topicFloor = topicParts[2] || \"floor1\";\nconst topicLine = topicParts[3] || \"line1\";\nconst topicCell = topicParts[4] || \"cell1\";\nconst topicLampId = topicParts[5] || \"unknown_lamp\";\n\nconst lamp = data?.lamp || {};\nconst location = lamp?.location || {};\n\nmsg.payload = {\n    ldr: Number(data?.sensors?.ldrAdc ?? data?.sensors?.ldr ?? 0),\n    ripple_percent: Number(data?.sensors?.ripplePercent ?? 0),\n    rgb_r: Number(data?.sensors?.tcs34725?.R ?? 0),\n    rgb_g: Number(data?.sensors?.tcs34725?.G ?? 0),\n    rgb_b: Number(data?.sensors?.tcs34725?.B ?? 0),\n    rgb_c: Number(data?.sensors?.tcs34725?.C ?? 0),\n    anomaly_score: Number(data?.derived?.anomalyScore ?? 0),\n    rul_hours: Number(data?.derived?.rulHours ?? 0),\n    sim_time_hours: Number(data?.sim?.timeHours ?? 0),\n    sim_speed: Number(data?.sim?.speed ?? 0),\n    sim_playing: Number(data?.sim?.playing ? 1 : 0),\n    ambient_temp: Number(data?.environment?.ambientTemp ?? 0),\n    humidity: Number(data?.environment?.humidity ?? 0),\n    drive_current: Number(data?.environment?.driveCurrent ?? 0),\n    lamp_id: String(lamp?.id ?? topicLampId),\n    site: String(location?.site ?? topicSite),\n    floor: String(location?.floor ?? topicFloor),\n    line: String(location?.line ?? topicLine),\n    cell: String(location?.cell ?? topicCell),\n    source: \"simulated\"\n};\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -234,6 +234,65 @@
         "statusType": "auto",
         "x": 400,
         "y": 420,
+        "wires": []
+    },
+    {
+        "id": "9f0c1a2b3c4d5e6f",
+        "type": "mqtt in",
+        "z": "fde217c77fb16fbe",
+        "name": "ML Predictions In",
+        "topic": "factory/+/+/+/+/+/telemetry/predictions",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "0e0d7c63c7290efa",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 250,
+        "y": 520,
+        "wires": [
+            [
+                "2b7c9d1e3f4a5b6c"
+            ]
+        ]
+    },
+    {
+        "id": "2b7c9d1e3f4a5b6c",
+        "type": "function",
+        "z": "fde217c77fb16fbe",
+        "name": "Parse ML Prediction",
+        "func": "let data = msg.payload;\nif (typeof data === \"string\") {\n    try {\n        data = JSON.parse(data);\n    } catch (e) {\n        node.warn(\"Prediction payload is not valid JSON\");\n        return null;\n    }\n}\n\nif (!data || typeof data !== \"object\") {\n    return null;\n}\n\nconst topicParts = String(msg.topic || \"\").split(\"/\");\nconst topicSite = topicParts[1] || \"sitea\";\nconst topicFloor = topicParts[2] || \"floor1\";\nconst topicLine = topicParts[3] || \"line1\";\nconst topicCell = topicParts[4] || \"cell1\";\nconst topicLampId = topicParts[5] || \"unknown_lamp\";\n\nconst meta = data.meta || {};\nconst prediction = data.failure_prediction || {};\nconst fault = data.fault_classification || {};\nconst alert = data.alert || {};\nconst status = data.current_status || {};\n\nconst p3 = prediction.probability_3_days;\nconst p7 = prediction.probability_7_days;\nconst p14 = prediction.probability_14_days;\n\nmsg.payload = {\n    failure_prob_3d: Number(p3 == null ? 0 : p3),\n    failure_prob_7d: Number(p7 == null ? 0 : p7),\n    failure_prob_14d: Number(p14 == null ? 0 : p14),\n    estimated_remaining_days: Number(prediction.estimated_remaining_days == null ? -1 : prediction.estimated_remaining_days),\n    fault_label: String(fault.fault_label || data.fault_label || \"Unknown\"),\n    fault_type: Number(fault.predicted_fault_type == null ? -1 : fault.predicted_fault_type),\n    severity: String(alert.severity || data.severity || \"NONE\"),\n    alert_type: String(alert.alert_type || data.alert_type || \"NONE\"),\n    health_score: Number(status.health_score == null ? 0 : status.health_score),\n    current_state: String(status.state || data.current_state || \"UNKNOWN\"),\n    lamp_id: String(meta.luminaireId || data.bulb_id || topicLampId),\n    site: String(meta.site || topicSite),\n    floor: String(meta.floor || topicFloor),\n    line: String(meta.line || topicLine),\n    cell: String(meta.cell || topicCell),\n    source: \"ml\"\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 520,
+        "wires": [
+            [
+                "7a8b9c0d1e2f3a4b"
+            ]
+        ]
+    },
+    {
+        "id": "7a8b9c0d1e2f3a4b",
+        "type": "influxdb out",
+        "z": "fde217c77fb16fbe",
+        "influxdb": "6b9e0ea860ee3c58",
+        "name": "ml_predictions",
+        "measurement": "ml_predictions",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "light_org",
+        "bucket": "light_data",
+        "x": 710,
+        "y": 520,
         "wires": []
     }
 ]

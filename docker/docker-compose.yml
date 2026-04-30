@@ -1,5 +1,4 @@
 services:
-
   mosquitto:
     image: eclipse-mosquitto:2
     container_name: mosquitto
@@ -76,6 +75,36 @@ services:
     ports:
       - "1880:1880"
     depends_on:
+      - mosquitto
+    networks:
+      - iot_network
+
+  # -----------------------------------------------------------------------
+  # Python Edge AI service
+  # Runs XGBoost failure prediction, fault classification, anomaly
+  # detection, and alert publishing.  Subscribes to sensor data via
+  # MQTT, exposes a FastAPI REST API on port 5000.
+  # -----------------------------------------------------------------------
+  python-edge:
+    build:
+      context: ../python
+      dockerfile: Dockerfile
+    image: python-edge
+    container_name: python-edge
+    environment:
+      - INFLUXDB_URL=http://influxdb:8086
+      - INFLUXDB_TOKEN=root-token
+      - INFLUXDB_ORG=light_org
+      - INFLUXDB_BUCKET=light_data
+      - MQTT_URL=mqtt://mosquitto:1883
+      - MQTT_TOPIC_ALERTS=factory/sitea/floor1/line1/cell1/lum_0001/alerts/status
+      - MQTT_TOPIC_PREDICTIONS=factory/{site}/{floor}/{line}/{cell}/{bulb_id}/telemetry/predictions
+      - MQTT_TOPIC_DATA=factory/+/+/+/+/+/telemetry/raw
+      - MQTT_TOPIC_EDGE=factory/+/+/+/+/+/telemetry/edge-ai
+    ports:
+      - "5000:5000"
+    depends_on:
+      - influxdb
       - mosquitto
     networks:
       - iot_network

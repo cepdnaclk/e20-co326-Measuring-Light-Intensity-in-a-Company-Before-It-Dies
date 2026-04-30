@@ -17,6 +17,14 @@
                 "welcome": "4.1.6"
             }
         },
-        "menu-menu-item-sidebar": true
+        "menu-menu-item-sidebar": true,
+        "debug": {
+            "filter": "filterSelected",
+            "filteredNodes": [
+                "37ce0f544afd4181",
+                "8349cce1af2e3775",
+                "a6d26a57e9fa7e13"
+            ]
+        }
     }
 }
