@@ -75,6 +75,17 @@ html:not(.dark) .text-secondary{color:#0f8a3a!important}
 html:not(.dark) .text-error{color:#b42318!important}
 html:not(.dark) .hero-bottom-fade{background:linear-gradient(to bottom,transparent 72%,rgba(237,243,245,0.92) 100%)}
 html:not(.dark) #parameters .text-secondary-container{color:#0f8a3a!important}
+html:not(.dark) #parameters .col-span-12.lg\:col-span-5 > .p-lg.rounded-xl{
+  background:rgba(255,255,255,0.9)!important;
+  border-color:rgba(180,35,24,0.22)!important;
+}
+html:not(.dark) #parameters .col-span-12.lg\:col-span-5 > .p-lg.rounded-xl li{
+  background:rgba(180,35,24,0.06)!important;
+  border-color:rgba(180,35,24,0.18)!important;
+}
+html:not(.dark) #parameters .col-span-12.lg\:col-span-5 > .p-lg.rounded-xl .text-error-container{
+  color:#b42318!important;
+}
 html:not(.dark) #parameters .grid.grid-cols-1.md\:grid-cols-2.gap-gutter > div{
   background:#ffffff!important;
   border-color:rgba(15,31,34,0.16)!important;
@@ -107,6 +118,13 @@ html:not(.dark) #architecture .reveal.reveal-delay-1 .flex.flex-wrap.gap-sm > di
 }
 html:not(.dark) #architecture .reveal.reveal-delay-1 .flex.flex-wrap.gap-sm > div .text-on-surface{
   color:#0f1f22!important;
+}
+html:not(.dark) #architecture .bg-surface-container-highest{
+  background:rgba(0,104,117,0.10)!important;
+  border-color:rgba(0,104,117,0.24)!important;
+}
+html:not(.dark) #architecture .bg-surface-container-highest.text-primary{
+  color:#0a4c55!important;
 }
 
 @media(prefers-reduced-motion:reduce){
