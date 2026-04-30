@@ -125,6 +125,10 @@ def convert_to_tflite(model, X_train):
     converter.inference_input_type = tf.float32   # keep float input for convenience
     converter.inference_output_type = tf.float32
 
+    # tflm_esp32's FullyConnected kernel only supports per-TENSOR quantisation.
+    # Per-channel quantisation on Dense layers causes "not yet supported" at runtime.
+    converter._experimental_disable_per_channel_quantization_for_dense_layers = True
+
     tflite_model = converter.convert()
     return tflite_model
 

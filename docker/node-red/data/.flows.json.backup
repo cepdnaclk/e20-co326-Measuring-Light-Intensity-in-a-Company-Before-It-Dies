@@ -262,7 +262,7 @@
         "type": "function",
         "z": "fde217c77fb16fbe",
         "name": "Parse ML Prediction",
-        "func": "let data = msg.payload;\nif (typeof data === \"string\") {\n    try {\n        data = JSON.parse(data);\n    } catch (e) {\n        node.warn(\"Prediction payload is not valid JSON\");\n        return null;\n    }\n}\n\nif (!data || typeof data !== \"object\") {\n    return null;\n}\n\nconst topicParts = String(msg.topic || \"\").split(\"/\");\nconst topicSite = topicParts[1] || \"sitea\";\nconst topicFloor = topicParts[2] || \"floor1\";\nconst topicLine = topicParts[3] || \"line1\";\nconst topicCell = topicParts[4] || \"cell1\";\nconst topicLampId = topicParts[5] || \"unknown_lamp\";\n\nconst meta = data.meta || {};\nconst prediction = data.failure_prediction || {};\nconst fault = data.fault_classification || {};\nconst alert = data.alert || {};\nconst status = data.current_status || {};\n\nconst p3 = prediction.probability_3_days;\nconst p7 = prediction.probability_7_days;\nconst p14 = prediction.probability_14_days;\n\nmsg.payload = {\n    failure_prob_3d: Number(p3 == null ? 0 : p3),\n    failure_prob_7d: Number(p7 == null ? 0 : p7),\n    failure_prob_14d: Number(p14 == null ? 0 : p14),\n    estimated_remaining_days: Number(prediction.estimated_remaining_days == null ? -1 : prediction.estimated_remaining_days),\n    fault_label: String(fault.fault_label || data.fault_label || \"Unknown\"),\n    fault_type: Number(fault.predicted_fault_type == null ? -1 : fault.predicted_fault_type),\n    severity: String(alert.severity || data.severity || \"NONE\"),\n    alert_type: String(alert.alert_type || data.alert_type || \"NONE\"),\n    health_score: Number(status.health_score == null ? 0 : status.health_score),\n    current_state: String(status.state || data.current_state || \"UNKNOWN\"),\n    lamp_id: String(meta.luminaireId || data.bulb_id || topicLampId),\n    site: String(meta.site || topicSite),\n    floor: String(meta.floor || topicFloor),\n    line: String(meta.line || topicLine),\n    cell: String(meta.cell || topicCell),\n    source: \"ml\"\n};\n\nreturn msg;",
+        "func": "let data = msg.payload;\nif (typeof data === \"string\") {\n    try {\n        data = JSON.parse(data);\n    } catch (e) {\n        node.warn(\"Prediction payload is not valid JSON\");\n        return null;\n    }\n}\n\nif (!data || typeof data !== \"object\") {\n    return null;\n}\n\nconst topicParts = String(msg.topic || \"\").split(\"/\");\nconst topicSite = topicParts[1] || \"sitea\";\nconst topicFloor = topicParts[2] || \"floor1\";\nconst topicLine = topicParts[3] || \"line1\";\nconst topicCell = topicParts[4] || \"cell1\";\nconst topicLampId = topicParts[5] || \"unknown_lamp\";\n\nconst meta = data.meta || {};\nconst prediction = data.failure_prediction || {};\nconst fault = data.fault_classification || {};\nconst alert = data.alert || {};\nconst status = data.current_status || {};\n\nconst p3 = prediction.probability_3_days;\nconst p7 = prediction.probability_7_days;\nconst p14 = prediction.probability_14_days;\n\nconst faultLabel = String(fault.fault_label || data.fault_label || \"Unknown\");\nconst severity = String(alert.severity || data.severity || \"NONE\");\nconst alertType = String(alert.alert_type || data.alert_type || \"NONE\");\nconst currentState = String(status.state || data.current_state || \"UNKNOWN\");\n\nconst fields = {\n    failure_prob_3d: Number(p3 == null ? 0 : p3),\n    failure_prob_7d: Number(p7 == null ? 0 : p7),\n    failure_prob_14d: Number(p14 == null ? 0 : p14),\n    estimated_remaining_days: Number(prediction.estimated_remaining_days == null ? -1 : prediction.estimated_remaining_days),\n    fault_type: Number(fault.predicted_fault_type == null ? -1 : fault.predicted_fault_type),\n    health_score: Number(status.health_score == null ? 0 : status.health_score),\n    fault_label_text: faultLabel,\n    severity_text: severity,\n    alert_type_text: alertType,\n    current_state_text: currentState\n};\n\nconst tags = {\n    fault_label: faultLabel,\n    severity: severity,\n    alert_type: alertType,\n    current_state: currentState,\n    lamp_id: String(meta.luminaireId || data.bulb_id || topicLampId),\n    site: String(meta.site || topicSite),\n    floor: String(meta.floor || topicFloor),\n    line: String(meta.line || topicLine),\n    cell: String(meta.cell || topicCell),\n    source: \"ml\"\n};\n\nmsg.payload = [fields, tags];\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -273,7 +273,8 @@
         "y": 520,
         "wires": [
             [
-                "7a8b9c0d1e2f3a4b"
+                "7a8b9c0d1e2f3a4b",
+                "66753575907d7f22"
             ]
         ]
     },
@@ -291,8 +292,71 @@
         "retentionPolicyV18Flux": "",
         "org": "light_org",
         "bucket": "light_data",
-        "x": 710,
+        "x": 720,
         "y": 520,
+        "wires": []
+    },
+    {
+        "id": "66753575907d7f22",
+        "type": "debug",
+        "z": "fde217c77fb16fbe",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 900,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "ea1b2c3d4e5f6a7b",
+        "type": "mqtt in",
+        "z": "fde217c77fb16fbe",
+        "name": "Edge-AI In",
+        "topic": "factory/light/edge-ai",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "0e0d7c63c7290efa",
+        "inputs": 0,
+        "x": 260,
+        "y": 700,
+        "wires": [
+            [
+                "fb2c3d4e5f6a7b8c"
+            ]
+        ]
+    },
+    {
+        "id": "fb2c3d4e5f6a7b8c",
+        "type": "function",
+        "z": "fde217c77fb16fbe",
+        "name": "Parse Edge-AI JSON",
+        "func": "let data=msg.payload;\nif(typeof data==='string'){try{data=JSON.parse(data);}catch(e){return null;}}\nmsg.payload=[{status:String(data.status||'UNKNOWN'),confidence:Number(data.confidence||0),score_healthy:Number((data.scores&&data.scores[0])||0),score_degrading:Number((data.scores&&data.scores[1])||0),score_failed:Number((data.scores&&data.scores[2])||0),sudden_failure:data.sudden_failure?1:0,ldr:Number(data.ldr||0)},{source:'esp32_tinyml'}];\nreturn msg;",
+        "outputs": 1,
+        "x": 480,
+        "y": 700,
+        "wires": [
+            [
+                "gc3d4e5f6a7b8c9d"
+            ]
+        ]
+    },
+    {
+        "id": "gc3d4e5f6a7b8c9d",
+        "type": "influxdb out",
+        "z": "fde217c77fb16fbe",
+        "influxdb": "6b9e0ea860ee3c58",
+        "name": "edge_ai",
+        "measurement": "edge_ai",
+        "precisionV18FluxV20": "ms",
+        "org": "light_org",
+        "bucket": "light_data",
+        "x": 720,
+        "y": 700,
         "wires": []
     }
 ]
