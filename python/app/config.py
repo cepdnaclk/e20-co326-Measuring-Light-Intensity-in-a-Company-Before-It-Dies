@@ -58,8 +58,10 @@ FAILURE_PREDICTOR_PATH = os.path.join(MODEL_DIR, "failure_predictor.joblib")
 # ---------------------------------------------------------------------------
 # Prediction scheduler
 # ---------------------------------------------------------------------------
+# TESTING: Change PREDICTION_INTERVAL_SECONDS to test different cadences.
+# Set to 30 for rapid testing, 3600 (1 hour) for production.
 PREDICTION_INTERVAL_SECONDS = int(
-    os.getenv("PREDICTION_INTERVAL_SECONDS", "3600")  # 1 hour default
+    os.getenv("PREDICTION_INTERVAL_SECONDS", "10")  # 30 seconds for testing
 )
 
 # ---------------------------------------------------------------------------
