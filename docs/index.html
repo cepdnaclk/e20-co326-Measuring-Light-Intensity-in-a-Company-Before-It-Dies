@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html class="dark scroll-smooth" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Digital Twin LED Luminaire Monitor</title>
+<link rel="icon" type="image/svg+xml" href="./images/bulb-favicon.svg"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config={darkMode:"class",theme:{extend:{
+colors:{"error-container":"#93000a","error":"#ffb4ab","secondary-fixed-dim":"#3ce36a","secondary-fixed":"#69ff87","outline-variant":"#3b494c","background":"#0d1516","on-primary-container":"#00626e","surface-bright":"#333a3c","tertiary-fixed":"#ffe170","tertiary-container":"#f5cd00","surface-tint":"#00daf3","surface-container-highest":"#2e3638","secondary-container":"#02c953","on-error":"#690005","on-surface-variant":"#bac9cc","on-secondary":"#003912","surface-variant":"#2e3638","inverse-on-surface":"#2a3233","on-tertiary-fixed-variant":"#544600","on-error-container":"#ffdad6","primary-fixed":"#9cf0ff","on-primary":"#00363d","secondary":"#40e56c","surface-container-low":"#151d1e","on-secondary-container":"#004d1b","primary-container":"#00e5ff","on-surface":"#dce4e5","on-secondary-fixed":"#002108","surface-container":"#192122","outline":"#849396","primary-fixed-dim":"#00daf3","on-secondary-fixed-variant":"#00531e","surface":"#0d1516","tertiary-fixed-dim":"#e9c400","on-tertiary-fixed":"#221b00","surface-container-lowest":"#080f11","on-primary-fixed-variant":"#004f58","on-background":"#dce4e5","on-tertiary-container":"#695700","tertiary":"#ffecac","inverse-primary":"#006875","on-primary-fixed":"#001f24","surface-dim":"#0d1516","surface-container-high":"#242b2d","on-tertiary":"#3a3000","inverse-surface":"#dce4e5","primary":"#c3f5ff"},
+borderRadius:{DEFAULT:"0.125rem",lg:"0.25rem",xl:"0.5rem",full:"0.75rem"},
+spacing:{xl:"64px",margin:"48px",gutter:"24px",xs:"8px",base:"4px",md:"24px",sm:"16px",lg:"40px"},
+fontFamily:{"headline-xl":["Space Grotesk"],"label-sm":["Space Grotesk"],"headline-lg":["Space Grotesk"],"data-lg":["Space Grotesk"],"body-md":["Inter"]},
+fontSize:{"headline-xl":["48px",{"lineHeight":"1.1","letterSpacing":"-0.02em","fontWeight":"700"}],"label-sm":["12px",{"lineHeight":"1","fontWeight":"500"}],"headline-lg":["32px",{"lineHeight":"1.2","fontWeight":"600"}],"data-lg":["24px",{"lineHeight":"1","letterSpacing":"0.05em","fontWeight":"700"}],"body-md":["16px",{"lineHeight":"1.6","fontWeight":"400"}]}
+}}}
+</script>
+<link rel="stylesheet" href="./assets/css/site.css">
+</head>
+<body class="bg-background text-on-background font-body-md selection:bg-primary-container selection:text-on-primary-container">
+
+<!-- ===== HEADER (single instance) ===== -->
+<header class="fixed top-0 w-full z-50 border-b border-[#00E5FF]/20 bg-zinc-950/50 backdrop-blur-xl flex justify-between items-center px-12 h-20 shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
+  <div class="brand-wordmark">
+    <div class="wordmark-title">
+      <span class="lum">Lum</span><span class="edge">Edge</span>
+    </div>
+    <div class="wordmark-sub">Predictive Maintenance for LED Systems</div>
+  </div>
+  <nav class="hidden md:flex items-center gap-8" id="mainNav">
+    <a class="nav-link font-label-sm text-xs font-bold tracking-wider uppercase text-zinc-400 hover:text-[#00E5FF] pb-1" href="#parameters" data-section="parameters">Parameters</a>
+    <a class="nav-link font-label-sm text-xs font-bold tracking-wider uppercase text-zinc-400 hover:text-[#00E5FF] pb-1" href="#architecture" data-section="architecture">Architecture</a>
+    <a class="nav-link font-label-sm text-xs font-bold tracking-wider uppercase text-zinc-400 hover:text-[#00E5FF] pb-1" href="#simulation" data-section="simulation">Simulation</a>
+  </nav>
+  <div class="flex items-center gap-6">
+    <div class="flex gap-4 text-zinc-400">
+      <span class="material-symbols-outlined hover:text-[#00E5FF] cursor-pointer transition-colors p-2 rounded-full hover:bg-[#00E5FF]/10">settings</span>
+      <span class="material-symbols-outlined hover:text-[#00E5FF] cursor-pointer transition-colors p-2 rounded-full hover:bg-[#00E5FF]/10">account_circle</span>
+    </div>
+  </div>
+</header>
+
+<!-- ===== SIDE NAV (single instance) ===== -->
+<aside class="fixed right-8 top-1/2 -translate-y-1/2 w-16 rounded-full border border-white/5 bg-zinc-950/30 backdrop-blur-lg shadow-2xl flex flex-col items-center gap-5 py-8 z-40">
+  <button class="side-btn flex items-center justify-center w-8 h-8 rounded-full transition-all duration-500 text-zinc-500 opacity-50 hover:opacity-100 hover:scale-110" data-tip="Overview" data-section="hero" onclick="document.getElementById('hero').scrollIntoView({behavior:'smooth'})">
+    <span class="material-symbols-outlined text-[18px]">sensors</span>
+  </button>
+  <button class="side-btn flex items-center justify-center w-8 h-8 rounded-full transition-all duration-500 text-zinc-500 opacity-50 hover:opacity-100 hover:scale-110" data-tip="Parameters" data-section="parameters" onclick="document.getElementById('parameters').scrollIntoView({behavior:'smooth'})">
+    <span class="material-symbols-outlined text-[18px]">analytics</span>
+  </button>
+  <button class="side-btn flex items-center justify-center w-8 h-8 rounded-full transition-all duration-500 text-zinc-500 opacity-50 hover:opacity-100 hover:scale-110" data-tip="Architecture" data-section="architecture" onclick="document.getElementById('architecture').scrollIntoView({behavior:'smooth'})">
+    <span class="material-symbols-outlined text-[18px]">account_tree</span>
+  </button>
+  <button class="side-btn flex items-center justify-center w-8 h-8 rounded-full transition-all duration-500 text-zinc-500 opacity-50 hover:opacity-100 hover:scale-110" data-tip="Simulation" data-section="simulation" onclick="document.getElementById('simulation').scrollIntoView({behavior:'smooth'})">
+    <span class="material-symbols-outlined text-[18px]">biotech</span>
+  </button>
+</aside>
+
+<!-- ===== MAIN CONTENT ===== -->
+<main class="relative min-h-screen pt-20 overflow-hidden">
+
+<!-- ===== HERO SECTION ===== -->
+<section id="hero" class="relative min-h-screen flex flex-col">
+  <div class="absolute inset-0 z-0 pointer-events-none">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_70%_40%,rgba(0,229,255,0.1),transparent_50%)]"></div>
+    <div class="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_70%,#0d1516_100%)]"></div>
+  </div>
+
+  <div class="flex-grow grid grid-cols-12 gap-gutter px-margin relative z-10 py-xl items-center">
+    <!-- Left Content -->
+    <div class="col-span-12 lg:col-span-6 flex flex-col gap-lg reveal">
+      <div class="flex items-center gap-xs">
+        <div class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_#40e56c] animate-pulse"></div>
+        <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em]">Operational Precision: Live Link</span>
+      </div>
+      <h1 class="font-headline-xl text-headline-xl text-primary max-w-2xl">
+        From Light Degradation to <span class="text-primary-container">Actionable Prediction</span>
+      </h1>
+      <p class="font-body-md text-body-md text-on-surface-variant max-w-xl">
+        This implemented end-to-end platform uses simulator streams, MQTT data pipelines, and FastAPI intelligence services to produce interpretable 3-day, 7-day, and 14-day failure probabilities for proactive luminaire maintenance planning.
+      </p>
+      <div class="grid grid-cols-3 gap-md mt-sm reveal reveal-delay-1">
+        <div class="glass-panel p-sm rounded-lg">
+          <span class="font-label-sm text-label-sm text-on-surface-variant uppercase">3-Day Prob.</span>
+          <div class="font-data-lg text-data-lg text-secondary mt-xs">0.04%</div>
+        </div>
+        <div class="glass-panel p-sm rounded-lg">
+          <span class="font-label-sm text-label-sm text-on-surface-variant uppercase">7-Day Prob.</span>
+          <div class="font-data-lg text-data-lg text-tertiary-fixed-dim mt-xs">1.28%</div>
+        </div>
+        <div class="glass-panel p-sm rounded-lg" style="border-color:rgba(255,180,171,0.2)">
+          <span class="font-label-sm text-label-sm text-on-surface-variant uppercase">14-Day Prob.</span>
+          <div class="font-data-lg text-data-lg text-error mt-xs">8.92%</div>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-md mt-md reveal reveal-delay-2">
+        <a href="#architecture" class="px-xl py-md bg-primary-container text-on-primary-container font-label-sm text-label-sm uppercase tracking-widest font-bold rounded hover:shadow-[0_0_20px_rgba(0,229,255,0.4)] transition-all inline-block">Explore System Architecture</a>
+        <a href="#simulation" class="px-xl py-md border border-primary-container text-primary-container font-label-sm text-label-sm uppercase tracking-widest font-bold rounded hover:bg-primary-container/10 transition-all inline-block">Run Interactive Simulation</a>
+      </div>
+    </div>
+    <!-- Right Visual -->
+    <div class="col-span-12 lg:col-span-6 relative flex justify-center items-center reveal reveal-delay-1">
+      <div class="relative w-full aspect-square max-w-2xl">
+        <div class="absolute inset-0 flex items-center justify-center">
+          <div class="w-[80%] h-[80%] glass-panel rounded-full flex items-center justify-center p-xl relative">
+            <div class="absolute inset-4 rounded-full border border-primary-container/30 glow-cyan"></div>
+            <img class="w-full h-full object-contain relative z-10 drop-shadow-[0_0_40px_rgba(0,229,255,0.2)]" alt="Industrial LED luminaire with cyan glow" src="./images/Industrial LED luminaire with cyan glow.png"/>
+            <div class="absolute -top-4 -right-4 glass-panel p-md rounded-xl" style="border-color:rgba(64,229,108,0.3)">
+              <span class="font-label-sm text-[10px] text-secondary uppercase block mb-1">Status</span>
+              <span class="font-headline-lg text-[24px] text-on-surface">NOMINAL</span>
+            </div>
+            <div class="absolute bottom-1/4 -left-8 glass-panel p-md rounded-xl">
+              <span class="font-label-sm text-[10px] text-primary-container uppercase block mb-1">Temp</span>
+              <span class="font-headline-lg text-[24px] text-on-surface">42.4°C</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wave Telemetry Strip -->
+  <div class="mt-auto relative h-40 w-full wave-mask border-t border-white/5 bg-zinc-950/20 backdrop-blur-sm">
+    <div class="absolute top-4 left-margin flex items-center gap-sm z-10">
+      <span class="material-symbols-outlined text-primary-container text-sm">monitoring</span>
+      <span class="font-label-sm text-[10px] text-on-surface-variant uppercase tracking-widest">Real-Time Telemetry Feed: Node_01_Lumen_Sync</span>
+    </div>
+    <canvas id="waveCanvas" class="absolute inset-0 w-full h-32 opacity-50"></canvas>
+    <div class="absolute bottom-0 w-full h-px ortho-line opacity-50"></div>
+    <div class="absolute bottom-8 w-full h-px ortho-line opacity-20"></div>
+    <div class="absolute bottom-16 w-full h-px ortho-line opacity-10"></div>
+  </div>
+</section>
+
+<!-- ===== PARAMETERS SECTION ===== -->
+<section id="parameters" class="px-margin py-xl">
+  <div class="max-w-7xl mx-auto mb-lg">
+    <div class="inline-flex items-center gap-2 mb-sm reveal">
+      <span class="w-2 h-2 rounded-full bg-secondary animate-pulse shadow-[0_0_8px_#40e56c]"></span>
+      <span class="font-label-sm text-label-sm text-secondary uppercase tracking-[0.2em]">Operational Node: Active</span>
+    </div>
+    <h1 class="font-headline-xl text-headline-xl text-on-surface max-w-4xl mb-gutter reveal reveal-delay-1">
+      The Operational Gap: <span class="text-primary-container">Reactive</span> to <span class="text-secondary-container">Probability-Driven</span>.
+    </h1>
+  </div>
+
+  <div class="max-w-7xl mx-auto grid grid-cols-12 gap-gutter">
+    <!-- Left: Problem -->
+    <div class="col-span-12 lg:col-span-5 flex flex-col gap-gutter">
+      <div class="p-lg rounded-xl bg-surface-container/30 backdrop-blur-md border border-white/5 flex flex-col gap-md reveal reveal-delay-1">
+        <div class="flex items-center gap-xs">
+          <span class="material-symbols-outlined text-error">report_problem</span>
+          <h3 class="font-headline-lg text-headline-lg text-on-surface">System Latency</h3>
+        </div>
+        <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+          Legacy monitoring architectures fail at the intersection of environmental volatility and sensor degradation. Without predictive awareness, late detection becomes the operational norm, resulting in cascading failures across the electrical grid.
+        </p>
+        <ul class="space-y-sm mt-base">
+          <li class="flex items-start gap-sm p-sm bg-white/5 rounded-lg border border-white/5">
+            <span class="material-symbols-outlined text-error-container text-sm mt-1">close</span>
+            <div>
+              <strong class="text-on-surface font-semibold block">Late Detection</strong>
+              <span class="text-on-surface-variant text-sm">Fault identification typically occurs &gt;200ms post-event threshold.</span>
+            </div>
+          </li>
+          <li class="flex items-start gap-sm p-sm bg-white/5 rounded-lg border border-white/5">
+            <span class="material-symbols-outlined text-error-container text-sm mt-1">close</span>
+            <div>
+              <strong class="text-on-surface font-semibold block">No Probability Awareness</strong>
+              <span class="text-on-surface-variant text-sm">Static thresholds ignore the cumulative probability of environmental stressors.</span>
+            </div>
+          </li>
+          <li class="flex items-start gap-sm p-sm bg-white/5 rounded-lg border border-white/5">
+            <span class="material-symbols-outlined text-error-container text-sm mt-1">close</span>
+            <div>
+              <strong class="text-on-surface font-semibold block">Gradual vs Sudden Blindness</strong>
+              <span class="text-on-surface-variant text-sm">Threshold-only logic cannot reliably separate slow lumen degradation from abrupt electrical anomalies.</span>
+            </div>
+          </li>
+          <li class="flex items-start gap-sm p-sm bg-white/5 rounded-lg border border-white/5">
+            <span class="material-symbols-outlined text-error-container text-sm mt-1">close</span>
+            <div>
+              <strong class="text-on-surface font-semibold block">Weak Context Awareness</strong>
+              <span class="text-on-surface-variant text-sm">Temperature, humidity, and lifecycle effects are often ignored until fault conditions become severe.</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="relative group overflow-hidden rounded-xl h-64 border border-white/10 reveal reveal-delay-2">
+        <img class="w-full h-full object-cover grayscale transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0" alt="Server components with cyan indicator lights" src="./images/Server components with cyan indicator lights.png"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-80"></div>
+        <div class="absolute bottom-md left-md">
+          <span class="text-primary-container font-label-sm text-xs uppercase tracking-widest">Digital Twin Active</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Parameter Cards -->
+    <div class="col-span-12 lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-gutter">
+      <!-- Photometric -->
+      <div class="p-md rounded-xl bg-surface-container/40 backdrop-blur-xl border border-primary-container/20 hover:border-primary-container/50 transition-all duration-300 group reveal reveal-delay-1">
+        <div class="flex justify-between items-start mb-md">
+          <div>
+            <p class="font-label-sm text-label-sm text-primary-fixed-dim uppercase tracking-wider mb-base">Photometric</p>
+            <h4 class="font-headline-lg text-xl text-on-surface">LDR / Brightness</h4>
+          </div>
+          <span class="material-symbols-outlined text-primary-container">light_mode</span>
+        </div>
+        <div class="flex items-baseline gap-xs mb-md">
+          <span class="font-data-lg text-headline-xl text-on-surface">0.84</span>
+          <span class="text-on-surface-variant text-sm font-medium">lux/sec</span>
+        </div>
+        <div class="h-16 w-full flex items-end gap-[2px] mb-md overflow-hidden" id="spark1"></div>
+        <div class="space-y-base">
+          <div class="flex justify-between text-[10px] uppercase font-bold tracking-tighter text-on-surface-variant mb-1">
+            <span>Influence factor</span><span>88% Critical</span>
+          </div>
+          <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+            <div class="h-full bg-primary-container w-[88%] shadow-[0_0_8px_rgba(0,229,255,0.6)]"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Electrical -->
+      <div class="p-md rounded-xl bg-surface-container/40 backdrop-blur-xl border border-secondary/20 hover:border-secondary/50 transition-all duration-300 group reveal reveal-delay-2">
+        <div class="flex justify-between items-start mb-md">
+          <div>
+            <p class="font-label-sm text-label-sm text-secondary uppercase tracking-wider mb-base">Electrical</p>
+            <h4 class="font-headline-lg text-xl text-on-surface">Ripple % / Load</h4>
+          </div>
+          <span class="material-symbols-outlined text-secondary">electric_bolt</span>
+        </div>
+        <div class="flex items-baseline gap-xs mb-md">
+          <span class="font-data-lg text-headline-xl text-on-surface">2.4</span>
+          <span class="text-on-surface-variant text-sm font-medium">VRMS</span>
+        </div>
+        <div class="h-16 w-full flex items-end gap-[2px] mb-md overflow-hidden" id="spark2"></div>
+        <div class="space-y-base">
+          <div class="flex justify-between text-[10px] uppercase font-bold tracking-tighter text-on-surface-variant mb-1">
+            <span>Stability Margin</span><span>42% Nominal</span>
+          </div>
+          <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+            <div class="h-full bg-secondary w-[42%] shadow-[0_0_8px_rgba(64,229,108,0.6)]"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Environmental -->
+      <div class="p-md md:col-span-2 rounded-xl bg-surface-container/40 backdrop-blur-xl border border-tertiary/20 hover:border-tertiary/50 transition-all duration-300 group reveal reveal-delay-3">
+        <div class="flex justify-between items-center mb-md">
+          <div>
+            <p class="font-label-sm text-label-sm text-tertiary uppercase tracking-wider mb-base">Environmental</p>
+            <h4 class="font-headline-lg text-xl text-on-surface">Ambient Kinetics</h4>
+          </div>
+          <span class="material-symbols-outlined text-tertiary">thermostat</span>
+        </div>
+        <div class="grid grid-cols-2 gap-lg mb-md">
+          <div>
+            <div class="flex items-baseline gap-xs">
+              <span class="font-data-lg text-headline-xl text-on-surface">42.8</span>
+              <span class="text-on-surface-variant text-sm font-medium">°C</span>
+            </div>
+            <span class="text-[10px] text-zinc-500 uppercase tracking-widest">Internal Temp</span>
+          </div>
+          <div>
+            <div class="flex items-baseline gap-xs">
+              <span class="font-data-lg text-headline-xl text-on-surface">12.4</span>
+              <span class="text-on-surface-variant text-sm font-medium">%</span>
+            </div>
+            <span class="text-[10px] text-zinc-500 uppercase tracking-widest">Relative Humidity</span>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-lg">
+          <div class="space-y-base">
+            <div class="flex justify-between text-[10px] uppercase font-bold tracking-tighter text-on-surface-variant mb-1"><span>Thermal Stress</span><span>12%</span></div>
+            <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-tertiary w-[12%] shadow-[0_0_8px_rgba(255,236,172,0.6)]"></div></div>
+          </div>
+          <div class="space-y-base">
+            <div class="flex justify-between text-[10px] uppercase font-bold tracking-tighter text-on-surface-variant mb-1"><span>Corrosion Probability</span><span>5%</span></div>
+            <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-tertiary w-[5%] shadow-[0_0_8px_rgba(255,236,172,0.6)]"></div></div>
+          </div>
+        </div>
+      </div>
+      <!-- Optical + Lifecycle -->
+      <div class="p-md md:col-span-2 rounded-xl bg-surface-container/40 backdrop-blur-xl border border-primary-container/20 hover:border-primary-container/50 transition-all duration-300 group reveal reveal-delay-4">
+        <div class="flex justify-between items-center mb-md">
+          <div>
+            <p class="font-label-sm text-label-sm text-primary-fixed-dim uppercase tracking-wider mb-base">Optical + Lifecycle</p>
+            <h4 class="font-headline-lg text-xl text-on-surface">RGB Quality / Operating Hours</h4>
+          </div>
+          <span class="material-symbols-outlined text-primary-container">led</span>
+        </div>
+        <div class="grid grid-cols-2 gap-lg mb-md">
+          <div>
+            <div class="flex items-baseline gap-xs">
+              <span class="font-data-lg text-headline-xl text-on-surface">248 / 241 / 228</span>
+            </div>
+            <span class="text-[10px] text-zinc-500 uppercase tracking-widest">rgb_r / rgb_g / rgb_b</span>
+          </div>
+          <div>
+            <div class="flex items-baseline gap-xs">
+              <span class="font-data-lg text-headline-xl text-on-surface">9,420</span>
+              <span class="text-on-surface-variant text-sm font-medium">h</span>
+            </div>
+            <span class="text-[10px] text-zinc-500 uppercase tracking-widest">operating_hours</span>
+          </div>
+        </div>
+        <div class="space-y-base">
+          <div class="flex justify-between text-[10px] uppercase font-bold tracking-tighter text-on-surface-variant mb-1"><span>Lifecycle Influence</span><span>67%</span></div>
+          <div class="h-1 w-full bg-white/5 rounded-full overflow-hidden"><div class="h-full bg-primary-container w-[67%] shadow-[0_0_8px_rgba(0,229,255,0.6)]"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ARCHITECTURE SECTION ===== -->
+<section id="architecture" class="px-margin py-xl">
+  <div class="max-w-7xl mx-auto mb-lg">
+    <div class="flex items-center gap-xs mb-base reveal">
+      <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+      <span class="font-label-sm text-label-sm text-secondary uppercase tracking-widest">System Topography</span>
+    </div>
+    <h1 class="font-headline-xl text-headline-xl text-on-background mb-sm reveal reveal-delay-1">Architecture &amp; Node Logic</h1>
+    <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl reveal reveal-delay-2">
+      A mission-critical 4-layer framework designed for Industry 5.0 compliance, integrating real-time telemetry with predictive cloud intelligence.
+    </p>
+  </div>
+
+  <!-- 4 Layers -->
+  <div class="max-w-7xl mx-auto grid grid-cols-1 gap-gutter mb-xl relative">
+    <div class="absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-primary-container/50 via-primary-container/10 to-transparent hidden md:block"></div>
+
+    <!-- Layer 4 -->
+    <div class="glass-panel p-md rounded-lg flex flex-col md:flex-row gap-lg items-center relative z-10 hover:border-primary-container/40 transition-all duration-500 reveal">
+      <div class="flex-none w-16 h-16 rounded-full bg-primary-container/10 flex items-center justify-center border border-primary-container/30">
+        <span class="material-symbols-outlined text-primary-container text-3xl">insights</span>
+      </div>
+      <div class="flex-grow">
+        <div class="flex items-baseline gap-sm mb-xs">
+          <span class="font-data-lg text-data-lg text-primary-container">04</span>
+          <h3 class="font-headline-lg text-headline-lg uppercase text-on-surface">Application Layer</h3>
+        </div>
+        <div class="flex flex-wrap gap-xs mb-sm">
+          <span class="px-3 py-1 bg-surface-container-highest text-primary font-label-sm text-xs rounded border border-white/5">Grafana Dashboards</span>
+          <span class="px-3 py-1 bg-surface-container-highest text-primary font-label-sm text-xs rounded border border-white/5">Decision Support Systems</span>
+        </div>
+        <p class="text-on-surface-variant font-body-md text-sm italic">User-centric visualization and executive-level analytical reporting interfaces.</p>
+      </div>
+      <div class="md:w-64 w-full h-32 rounded-lg bg-surface-container-low border border-white/10 overflow-hidden relative">
+        <img class="w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-700" alt="Digital dashboard with cyan charts" src="./images/Digital dashboard with cyan charts.png"/>
+      </div>
+    </div>
+    <!-- Layer 3 -->
+    <div class="glass-panel p-md rounded-lg flex flex-col md:flex-row gap-lg items-center relative z-10 hover:border-primary-container/40 transition-all duration-500 reveal reveal-delay-1">
+      <div class="flex-none w-16 h-16 rounded-full bg-primary-container/10 flex items-center justify-center border border-primary-container/30">
+        <span class="material-symbols-outlined text-primary-container text-3xl">psychology</span>
+      </div>
+      <div class="flex-grow">
+        <div class="flex items-baseline gap-sm mb-xs">
+          <span class="font-data-lg text-data-lg text-primary-container">03</span>
+          <h3 class="font-headline-lg text-headline-lg uppercase text-on-surface">Cloud Intelligence</h3>
+        </div>
+        <div class="flex flex-wrap gap-xs mb-sm">
+          <span class="px-3 py-1 bg-surface-container-highest text-primary font-label-sm text-xs rounded border border-white/5">FastAPI Backend</span>
+          <span class="px-3 py-1 bg-surface-container-highest text-primary font-label-sm text-xs rounded border border-white/5">XGBoost ML Models</span>
+        </div>
+        <p class="text-on-surface-variant font-body-md text-sm italic">Scalable data processing pipelines and predictive forecasting through advanced machine learning.</p>
+      </div>
+      <div class="md:w-64 w-full h-32 rounded-lg bg-surface-container-low border border-white/10 overflow-hidden relative">
+        <img class="w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-700" alt="Neural network diagram with cyan nodes" src="./images/Neural network diagram with cyan nodes.png"/>
+      </div>
+    </div>
+    <!-- Layer 2 -->
+    <div class="glass-panel p-md rounded-lg flex flex-col md:flex-row gap-lg items-center relative z-10 hover:border-primary-container/40 transition-all duration-500 reveal reveal-delay-2">
+      <div class="flex-none w-16 h-16 rounded-full bg-primary-container/10 flex items-center justify-center border border-primary-container/30">
+        <span class="material-symbols-outlined text-primary-container text-3xl">hub</span>
+      </div>
+      <div class="flex-grow">
+        <div class="flex items-baseline gap-sm mb-xs">
+          <span class="font-data-lg text-data-lg text-primary-container">02</span>
+          <h3 class="font-headline-lg text-headline-lg uppercase text-on-surface">Connectivity Hub</h3>
+        </div>
+        <div class="flex flex-wrap gap-xs mb-sm">
+          <span class="px-3 py-1 bg-surface-container-highest text-primary font-label-sm text-xs rounded border border-white/5">MQTT Broker</span>
+          <span class="px-3 py-1 bg-surface-container-highest text-primary font-label-sm text-xs rounded border border-white/5">Node-RED Orchestration</span>
+        </div>
+        <p class="text-on-surface-variant font-body-md text-sm italic">Low-latency message queuing and logic routing for resilient edge-to-cloud communication.</p>
+      </div>
+      <div class="md:w-64 w-full h-32 rounded-lg bg-surface-container-low border border-white/10 overflow-hidden relative">
+        <img class="w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-700" alt="Fiber optic cables with cyan glow" src="./images/Fiber optic cables with cyan glow.png"/>
+      </div>
+    </div>
+    <!-- Layer 1 -->
+    <div class="glass-panel p-md rounded-lg flex flex-col md:flex-row gap-lg items-center relative z-10 hover:border-primary-container/40 transition-all duration-500 reveal reveal-delay-3">
+      <div class="flex-none w-16 h-16 rounded-full bg-primary-container/10 flex items-center justify-center border border-primary-container/30">
+        <span class="material-symbols-outlined text-primary-container text-3xl">settings_input_component</span>
+      </div>
+      <div class="flex-grow">
+        <div class="flex items-baseline gap-sm mb-xs">
+          <span class="font-data-lg text-data-lg text-primary-container">01</span>
+          <h3 class="font-headline-lg text-headline-lg uppercase text-on-surface">Edge Sensors</h3>
+        </div>
+        <div class="flex flex-wrap gap-xs mb-sm">
+          <span class="px-3 py-1 bg-surface-container-highest text-primary font-label-sm text-xs rounded border border-white/5">ESP32 Microcontrollers</span>
+          <span class="px-3 py-1 bg-surface-container-highest text-primary font-label-sm text-xs rounded border border-white/5">Precision Telemetry</span>
+        </div>
+        <p class="text-on-surface-variant font-body-md text-sm italic">Direct physical hardware interaction and pre-processing of raw environmental data.</p>
+      </div>
+      <div class="md:w-64 w-full h-32 rounded-lg bg-surface-container-low border border-white/10 overflow-hidden relative">
+        <img class="w-full h-full object-cover opacity-60 grayscale hover:grayscale-0 transition-all duration-700" alt="ESP32 microcontroller close-up" src="./images/ESP32 microcontroller close-up.png"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- Industry 5.0 -->
+  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-gutter mb-xl">
+    <div class="glass-panel p-sm rounded border-l-4 border-secondary/50 reveal">
+      <div class="flex items-center gap-xs mb-xs">
+        <span class="material-symbols-outlined text-secondary text-sm">person_pin</span>
+        <span class="font-label-sm text-xs uppercase text-secondary">Human-Centric</span>
+      </div>
+      <p class="text-xs text-on-surface-variant leading-relaxed">Augmenting worker capability through real-time feedback loops and intuitive visual cues.</p>
+    </div>
+    <div class="glass-panel p-sm rounded border-l-4 border-primary-container/50 reveal reveal-delay-1">
+      <div class="flex items-center gap-xs mb-xs">
+        <span class="material-symbols-outlined text-primary-container text-sm">energy_savings_leaf</span>
+        <span class="font-label-sm text-xs uppercase text-primary-container">Sustainable</span>
+      </div>
+      <p class="text-xs text-on-surface-variant leading-relaxed">Optimizing power consumption across the edge-node network for minimal carbon footprint.</p>
+    </div>
+    <div class="glass-panel p-sm rounded border-l-4 border-tertiary-container/50 reveal reveal-delay-2">
+      <div class="flex items-center gap-xs mb-xs">
+        <span class="material-symbols-outlined text-tertiary-container text-sm">health_and_safety</span>
+        <span class="font-label-sm text-xs uppercase text-tertiary-container">Resilient</span>
+      </div>
+      <p class="text-xs text-on-surface-variant leading-relaxed">Fault-tolerant architecture ensuring system stability even during partial network latency.</p>
+    </div>
+  </div>
+
+  <!-- Docs & Tech Stack -->
+  <div class="max-w-7xl mx-auto border-t border-white/10 pt-lg">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-xl">
+      <div class="reveal">
+        <h4 class="font-headline-lg text-headline-lg text-on-surface mb-md">System Documentation</h4>
+        <div class="flex flex-col gap-sm">
+          <a href="https://github.com/cepdnaclk/e20-co326-Digital-Twin-LED-Luminaire-Monitor" target="_blank" rel="noopener" class="flex items-center justify-between w-full p-sm glass-panel rounded hover:bg-primary-container/10 transition-colors group">
+            <div class="flex items-center gap-sm"><span class="material-symbols-outlined text-primary-container">terminal</span><span class="font-label-sm text-sm uppercase">Repository Source</span></div>
+            <span class="material-symbols-outlined text-zinc-500 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </a>
+          <a href="../README.md" class="flex items-center justify-between w-full p-sm glass-panel rounded hover:bg-primary-container/10 transition-colors group">
+            <div class="flex items-center gap-sm"><span class="material-symbols-outlined text-primary-container">description</span><span class="font-label-sm text-sm uppercase">Run &amp; Deployment Guide</span></div>
+            <span class="material-symbols-outlined text-zinc-500 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+      <div class="reveal reveal-delay-1">
+        <h4 class="font-headline-lg text-headline-lg text-on-surface mb-md">Built With</h4>
+        <div class="flex flex-wrap gap-sm">
+          <div class="flex items-center gap-xs px-4 py-2 rounded-full border border-white/5 bg-surface-container-low"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span><span class="font-label-sm text-xs text-on-surface">React</span></div>
+          <div class="flex items-center gap-xs px-4 py-2 rounded-full border border-white/5 bg-surface-container-low"><span class="w-1.5 h-1.5 rounded-full bg-[#00E5FF]"></span><span class="font-label-sm text-xs text-on-surface">Node.js</span></div>
+          <div class="flex items-center gap-xs px-4 py-2 rounded-full border border-white/5 bg-surface-container-low"><span class="w-1.5 h-1.5 rounded-full bg-error"></span><span class="font-label-sm text-xs text-on-surface">MQTT</span></div>
+          <div class="flex items-center gap-xs px-4 py-2 rounded-full border border-white/5 bg-surface-container-low"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span><span class="font-label-sm text-xs text-on-surface">Node-RED</span></div>
+          <div class="flex items-center gap-xs px-4 py-2 rounded-full border border-white/5 bg-surface-container-low"><span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span><span class="font-label-sm text-xs text-on-surface">InfluxDB</span></div>
+          <div class="flex items-center gap-xs px-4 py-2 rounded-full border border-white/5 bg-surface-container-low"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span><span class="font-label-sm text-xs text-on-surface">FastAPI</span></div>
+          <div class="flex items-center gap-xs px-4 py-2 rounded-full border border-white/5 bg-surface-container-low"><span class="w-1.5 h-1.5 rounded-full bg-[#00E5FF]"></span><span class="font-label-sm text-xs text-on-surface">XGBoost</span></div>
+          <div class="flex items-center gap-xs px-4 py-2 rounded-full border border-white/5 bg-surface-container-low"><span class="w-1.5 h-1.5 rounded-full bg-error"></span><span class="font-label-sm text-xs text-on-surface">Grafana</span></div>
+          <div class="flex items-center gap-xs px-4 py-2 rounded-full border border-white/5 bg-surface-container-low"><span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span><span class="font-label-sm text-xs text-on-surface">Docker</span></div>
+        </div>
+        <div class="mt-lg p-md glass-panel rounded border-dashed border-white/20">
+          <p class="text-xs text-zinc-500 font-label-sm uppercase mb-xs">Architecture Hash</p>
+          <code class="text-[10px] text-primary-container/70 break-all font-mono">SHA-256: 48e9c9c400221b00080f11004f58dce4e5695700ffecac006875001f24</code>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SIMULATION SECTION ===== -->
+<section id="simulation" class="px-margin py-xl">
+  <div class="max-w-[1400px] mx-auto">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-md">
+      <div class="space-y-2 reveal">
+        <div class="flex items-center gap-3">
+          <span class="w-2 h-2 bg-secondary rounded-full animate-pulse"></span>
+          <span class="font-label-sm text-secondary tracking-widest uppercase">Digital Twin Sensor Simulator / lum_0001</span>
+        </div>
+        <h1 class="font-headline-xl text-on-surface">Interactive Luminaire Sensor Simulator</h1>
+        <p class="font-body-md text-zinc-400 max-w-xl italic">Standalone what-if simulator: adjust RGB shift, ambient temperature, light intensity, and ripple shift to study how sensor patterns and stress indicators evolve visually.</p>
+      </div>
+      <div class="flex flex-col items-start md:items-end gap-2 reveal reveal-delay-1">
+        <span class="font-label-sm text-zinc-500 uppercase tracking-widest">Current Risk Profile</span>
+        <div class="px-6 py-2 bg-error-container/20 border border-error/40 text-error font-headline-lg rounded-sm shadow-[0_0_15px_rgba(255,180,171,0.2)]" id="riskBadge">CRITICAL</div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-gutter">
+      <!-- Controls -->
+      <div class="col-span-12 lg:col-span-4 glass-panel p-8 flex flex-col gap-8 rounded-lg reveal">
+        <div class="flex items-center gap-3 border-b border-[#00E5FF]/20 pb-4">
+          <span class="material-symbols-outlined text-[#00E5FF]">tune</span>
+          <h2 class="font-headline-lg text-primary text-xl uppercase tracking-tighter">Simulator Controls</h2>
+        </div>
+        <!-- RGB Shift Slider -->
+        <div class="space-y-3">
+          <div class="flex justify-between items-center">
+            <label class="font-label-sm text-[#00E5FF] tracking-widest uppercase text-[10px]">RGB Shift</label>
+            <span class="font-data-lg text-primary text-lg" id="rgbVal">0%</span>
+          </div>
+          <input type="range" id="rgbSlider" min="-40" max="40" value="0" step="1" style="--val:50%"/>
+          <div class="flex justify-between text-[9px] text-zinc-600 uppercase"><span>-40%</span><span>+40%</span></div>
+        </div>
+        <!-- Temp Slider -->
+        <div class="space-y-3">
+          <div class="flex justify-between items-center">
+            <label class="font-label-sm text-[#00E5FF] tracking-widest uppercase text-[10px]">Ambient Temperature</label>
+            <span class="font-data-lg text-primary text-lg" id="tempVal">42.0°C</span>
+          </div>
+          <input type="range" id="tempSlider" min="20" max="100" value="42" step="0.1" style="--val:27.5%"/>
+          <div class="flex justify-between text-[9px] text-zinc-600 uppercase"><span>20°C</span><span>100°C</span></div>
+        </div>
+        <!-- Intensity Slider -->
+        <div class="space-y-3">
+          <div class="flex justify-between items-center">
+            <label class="font-label-sm text-[#00E5FF] tracking-widest uppercase text-[10px]">Intensity</label>
+            <span class="font-data-lg text-primary text-lg" id="intensityVal">72%</span>
+          </div>
+          <input type="range" id="intensitySlider" min="10" max="100" value="72" step="1" style="--val:68.9%"/>
+          <div class="flex justify-between text-[9px] text-zinc-600 uppercase"><span>10%</span><span>100%</span></div>
+        </div>
+        <!-- Ripple Shift Slider -->
+        <div class="space-y-3">
+          <div class="flex justify-between items-center">
+            <label class="font-label-sm text-[#00E5FF] tracking-widest uppercase text-[10px]">Ripple Shift</label>
+            <span class="font-data-lg text-primary text-lg" id="rippleVal">+8%</span>
+          </div>
+          <input type="range" id="rippleSlider" min="0" max="30" value="8" step="0.1" style="--val:26.7%"/>
+          <div class="flex justify-between text-[9px] text-zinc-600 uppercase"><span>0%</span><span>100%</span></div>
+        </div>
+        <div class="mt-auto pt-8 border-t border-white/5">
+          <div class="flex items-center gap-3 text-zinc-500 mb-2">
+            <span class="material-symbols-outlined text-sm">info</span>
+            <span class="font-label-sm text-[10px] uppercase">Node Identity</span>
+          </div>
+          <div class="font-data-lg text-sm text-zinc-300">Default Instance: lum_0001</div>
+        </div>
+      </div>
+
+      <!-- Visualizer -->
+      <div class="col-span-12 lg:col-span-8 space-y-gutter">
+        <!-- Bell Curve Canvas -->
+        <div class="glass-panel p-8 rounded-lg h-[400px] flex flex-col relative overflow-hidden reveal reveal-delay-1">
+          <div class="flex justify-between items-start mb-6 relative z-10">
+            <div>
+              <h3 class="font-label-sm text-[#00E5FF] tracking-widest uppercase">Simulator Stress Distribution</h3>
+              <p class="text-[10px] text-zinc-500 uppercase mt-1">Derived from rgb shift, temperature, intensity, ripple</p>
+            </div>
+            <div class="flex gap-4">
+              <div class="flex items-center gap-2"><span class="w-2 h-2 bg-[#00E5FF]/40 rounded-full"></span><span class="font-label-sm text-[10px] text-zinc-400">NOMINAL</span></div>
+              <div class="flex items-center gap-2"><span class="w-2 h-2 bg-error rounded-full shadow-[0_0_8px_#ffb4ab]"></span><span class="font-label-sm text-[10px] text-error">THRESHOLD BREACH</span></div>
+            </div>
+          </div>
+          <div class="flex-1 relative">
+            <canvas id="bellCanvas" class="w-full h-full"></canvas>
+          </div>
+        </div>
+
+        <!-- Metrics -->
+        <div class="grid grid-cols-3 gap-gutter">
+          <div class="glass-panel p-6 rounded-lg border-l-4 border-error flex flex-col justify-between reveal reveal-delay-1">
+            <span class="font-label-sm text-zinc-400 uppercase text-[10px] tracking-widest">Simulated Stress Index</span>
+            <div class="mt-4">
+              <div class="font-data-lg text-headline-lg text-error" id="riskPct">65.5<span class="text-lg opacity-50 ml-1">%</span></div>
+              <div class="font-label-sm text-[10px] text-error/60 mt-1 flex items-center gap-1" id="riskDelta">
+                <span class="material-symbols-outlined text-[12px]">trending_up</span>
+                +0.0% FROM BASELINE
+              </div>
+            </div>
+          </div>
+          <div class="glass-panel p-6 rounded-lg flex flex-col justify-between reveal reveal-delay-2">
+            <span class="font-label-sm text-zinc-400 uppercase text-[10px] tracking-widest">Estimated RUL (Hours)</span>
+            <div class="mt-4">
+              <div class="font-data-lg text-headline-lg text-primary" id="estDays">9600<span class="text-lg opacity-50 ml-1">H</span></div>
+              <div class="font-label-sm text-[10px] text-zinc-500 mt-1 uppercase">Approx. Simulator-Derived RUL</div>
+            </div>
+          </div>
+          <div class="glass-panel p-6 rounded-lg flex flex-col justify-between overflow-hidden relative reveal reveal-delay-3">
+            <span class="font-label-sm text-zinc-400 uppercase text-[10px] tracking-widest">Telemetry Context</span>
+            <div class="mt-4">
+              <div class="font-data-lg text-headline-lg text-on-surface">VISUAL<span class="text-lg opacity-50 ml-1">AID</span></div>
+              <div class="font-label-sm text-[10px] text-zinc-500 mt-1 uppercase">Sensor response preview</div>
+            </div>
+            <div class="absolute -right-4 -bottom-4 opacity-5"><span class="material-symbols-outlined text-8xl" style="font-variation-settings:'FILL' 1">biotech</span></div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter">
+          <div class="glass-panel p-sm rounded-lg">
+            <p class="font-label-sm text-[10px] uppercase text-zinc-500 mb-2">RGB Composite</p>
+            <div id="rgbSwatch" class="h-12 rounded border border-white/10"></div>
+          </div>
+          <div class="glass-panel p-sm rounded-lg">
+            <p class="font-label-sm text-[10px] uppercase text-zinc-500 mb-2">LDR Proxy</p>
+            <div class="h-2 bg-white/10 rounded-full overflow-hidden"><div id="ldrBar" class="h-full bg-primary-container w-[55%]"></div></div>
+          </div>
+          <div class="glass-panel p-sm rounded-lg">
+            <p class="font-label-sm text-[10px] uppercase text-zinc-500 mb-2">Ripple %</p>
+            <div class="h-2 bg-white/10 rounded-full overflow-hidden"><div id="rippleBar" class="h-full bg-tertiary w-[20%]"></div></div>
+          </div>
+          <div class="glass-panel p-sm rounded-lg">
+            <p class="font-label-sm text-[10px] uppercase text-zinc-500 mb-2">Thermal Stress</p>
+            <div class="h-2 bg-white/10 rounded-full overflow-hidden"><div id="tempBar" class="h-full bg-error w-[30%]"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Deploy Bar -->
+    <div class="mt-gutter glass-panel p-8 rounded-lg flex flex-col xl:flex-row items-start xl:items-center justify-between gap-lg reveal overflow-hidden">
+      <div class="flex gap-6 md:gap-12 items-start md:items-center min-w-0 w-full">
+        <img class="w-24 h-24 md:w-32 md:h-32 rounded-lg object-cover grayscale brightness-75 border border-white/10 hidden md:block" alt="Semiconductor circuit board" src="./images/Semiconductor circuit board.png"/>
+        <div class="min-w-0 w-full">
+          <h4 class="font-headline-lg text-lg text-primary uppercase mb-2">Simulator Data Path Mapping</h4>
+          <p class="font-body-md text-zinc-400 text-sm max-w-3xl mb-4">End-to-end horizontal data flow for synthetic luminaire telemetry.</p>
+          <div class="glass-panel p-3 rounded mb-3">
+            <p class="font-label-sm text-[10px] uppercase text-zinc-500 mb-2">Parallel LED Instances</p>
+            <div id="ledLane" class="flex flex-wrap items-center gap-2">
+              <div class="glass-panel flow-node px-3 py-2 rounded text-xs uppercase tracking-widest whitespace-nowrap" data-node="led-base">LED-BASE</div>
+            </div>
+          </div>
+          <div id="dataPathFlow" class="flex flex-wrap items-center gap-1.5 pb-2">
+            <div class="glass-panel flow-node px-2 py-1.5 rounded text-[10px] uppercase tracking-widest whitespace-nowrap" data-node="led-base"><span class="material-symbols-outlined flow-mark-icon">lightbulb</span>LED</div>
+            <div class="flow-link" data-link></div>
+            <div class="glass-panel flow-node px-2 py-1.5 rounded text-[10px] uppercase tracking-widest whitespace-nowrap" data-node="sensor"><span class="material-symbols-outlined flow-mark-icon">sensors</span>Sensor</div>
+            <div class="flow-link" data-link></div>
+            <div class="glass-panel flow-node px-2 py-1.5 rounded text-[10px] uppercase tracking-widest whitespace-nowrap" data-node="esp32"><span class="material-symbols-outlined flow-mark-icon">memory</span>ESP32</div>
+            <div class="flow-link" data-link></div>
+            <div class="glass-panel flow-node px-2 py-1.5 rounded text-[10px] uppercase tracking-widest whitespace-nowrap" data-node="mqtt"><span class="flow-mark" style="background:rgba(0,229,255,.18);color:#00e5ff;border:1px solid rgba(0,229,255,.4)">M</span>MQTT</div>
+            <div class="flow-link" data-link></div>
+            <div class="glass-panel flow-node px-2 py-1.5 rounded text-[10px] uppercase tracking-widest whitespace-nowrap" data-node="nodered"><span class="flow-mark" style="background:rgba(255,84,84,.18);color:#ff7b7b;border:1px solid rgba(255,84,84,.4)">NR</span>Node-RED</div>
+            <div class="flow-link" data-link></div>
+            <div class="glass-panel flow-node px-2 py-1.5 rounded text-[10px] uppercase tracking-widest whitespace-nowrap" data-node="influxdb"><span class="flow-mark" style="background:rgba(148,102,255,.18);color:#b794ff;border:1px solid rgba(148,102,255,.4)">I</span>InfluxDB</div>
+            <div class="flow-link" data-link></div>
+            <div class="glass-panel flow-node px-2 py-1.5 rounded text-[10px] uppercase tracking-widest whitespace-nowrap" data-node="grafana"><span class="flow-mark" style="background:rgba(255,153,51,.18);color:#ffb066;border:1px solid rgba(255,153,51,.4)">G</span>Grafana</div>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col items-stretch xl:items-end gap-4 w-full xl:w-auto xl:flex-shrink-0">
+        <div class="flex gap-2">
+          <span class="px-3 py-1 bg-white/5 border border-white/10 text-[10px] font-label-sm text-zinc-400 tracking-widest uppercase">SIM_V_02.01</span>
+          <span class="px-3 py-1 bg-secondary-container/20 border border-secondary-container text-[10px] font-label-sm text-secondary-fixed tracking-widest uppercase">ONLINE</span>
+        </div>
+        <button id="deployBtn" class="bg-primary-container text-on-primary-container font-label-sm uppercase px-6 md:px-8 py-3 tracking-widest hover:shadow-[0_0_20px_#00E5FF] transition-all font-bold whitespace-nowrap">Deploy Configuration</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TEAM SECTION ===== -->
+<section id="team" class="px-margin pt-4 pb-24">
+  <div class="max-w-7xl mx-auto mt-2 pt-md border-t border-white/5 opacity-80">
+    <h3 class="font-headline-lg text-on-surface mb-md">Contributors</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-md mb-md">
+      <div class="glass-panel p-sm rounded">
+        <p class="font-label-sm text-xs uppercase text-zinc-500">
+          <a href="https://people.ce.pdn.ac.lk/students/e20/032/" target="_blank" rel="noopener" class="hover:text-primary-container transition-colors">E/20/032</a>
+        </p>
+        <p class="text-on-surface">
+          <a href="https://people.ce.pdn.ac.lk/students/e20/032/" target="_blank" rel="noopener" class="hover:text-primary-container transition-colors">A.M.N.C. Bandara</a>
+        </p>
+      </div>
+      <div class="glass-panel p-sm rounded">
+        <p class="font-label-sm text-xs uppercase text-zinc-500">
+          <a href="https://people.ce.pdn.ac.lk/students/e20/157/" target="_blank" rel="noopener" class="hover:text-primary-container transition-colors">E/20/157</a>
+        </p>
+        <p class="text-on-surface">
+          <a href="https://people.ce.pdn.ac.lk/students/e20/157/" target="_blank" rel="noopener" class="hover:text-primary-container transition-colors">S.M.B.G. Janakantha</a>
+        </p>
+      </div>
+      <div class="glass-panel p-sm rounded">
+        <p class="font-label-sm text-xs uppercase text-zinc-500">
+          <a href="https://people.ce.pdn.ac.lk/students/e20/254/" target="_blank" rel="noopener" class="hover:text-primary-container transition-colors">E/20/254</a>
+        </p>
+        <p class="text-on-surface">
+          <a href="https://people.ce.pdn.ac.lk/students/e20/254/" target="_blank" rel="noopener" class="hover:text-primary-container transition-colors">S.K.P. Methpura</a>
+        </p>
+      </div>
+    </div>
+    <p class="font-label-sm text-xs text-zinc-400">Supervisor: <a href="https://people.ce.pdn.ac.lk/staff/academic/kamalanath-samarakoon/" target="_blank" rel="noopener" class="hover:text-primary-container transition-colors">Prof. Kamalanath Samarakoon</a></p>
+  </div>
+</section>
+
+</main>
+
+<!-- ===== TOAST ===== -->
+<div id="toast" class="fixed bottom-16 left-1/2 -translate-x-1/2 z-[60] px-6 py-3 glass-panel rounded-lg font-label-sm text-sm text-primary-container border-primary-container/40 opacity-0 translate-y-4 transition-all duration-300 pointer-events-none">
+  <span id="toastMsg"></span>
+</div>
+
+<script src="./assets/js/site.js"></script>
+</body>
+</html>
