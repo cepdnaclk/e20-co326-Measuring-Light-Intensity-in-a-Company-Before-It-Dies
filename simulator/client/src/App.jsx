@@ -333,30 +333,33 @@ export default function App() {
             <span className="status-pill neutral">{now.toLocaleTimeString()}</span>
           </div>
           <div className="top-control-group">
-          <button className="run-btn" onClick={togglePlay}>
-            {sim.playing ? "Pause" : "Run"}
-          </button>
-          <select
-            className="speed-select"
-            value={control.speed}
-            onChange={(e) => applyControl({ ...control, speed: Number(e.target.value) })}
-          >
-            <option value={0.5}>0.5x</option>
-            <option value={1}>1x</option>
-            <option value={3}>3x</option>
-            <option value={6}>6x</option>
-          </select>
-          <select
-            className="speed-select"
-            value={selectedInstanceId}
-            onChange={(e) => setSelectedInstanceId(e.target.value)}
-          >
-            {instances.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.id}
-              </option>
-            ))}
-          </select>
+            <button className="run-btn" onClick={togglePlay}>
+              {sim.playing ? "Pause" : "Run"}
+            </button>
+            <select
+              className="speed-select"
+              value={control.speed}
+              onChange={(e) => applyControl({ ...control, speed: Number(e.target.value) })}
+            >
+              <option value={0.5}>0.5x</option>
+              <option value={1}>1x</option>
+              <option value={3}>3x</option>
+              <option value={6}>6x</option>
+              <option value={10}>10x</option>
+              <option value={20}>20x</option>
+              <option value={30}>30x</option>
+            </select>
+            <select
+              className="speed-select"
+              value={selectedInstanceId}
+              onChange={(e) => setSelectedInstanceId(e.target.value)}
+            >
+              {instances.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.id}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
         <button
