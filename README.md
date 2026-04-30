@@ -118,6 +118,43 @@ The production UI will then serve the updated app from `http://localhost:5173`.
   docker compose down -v
   ```
 
+- Restart the simulator client after UI changes:
+
+  ```powershell
+  cd docker
+  docker compose restart simulator-client
+  ```
+
+- Rebuild the simulator client (production image) after UI changes:
+
+  ```powershell
+  cd docker
+  docker compose -f docker-compose.yml build simulator-client
+  docker compose -f docker-compose.yml up -d simulator-client
+  ```
+
+- Redeploy Python Edge AI service after config.py changes:
+
+  ```powershell
+  cd docker
+  docker compose up -d --build python-edge
+  ```
+
+  Or rebuild and restart explicitly:
+
+  ```powershell
+  cd docker
+  docker compose build python-edge
+  docker compose up -d python-edge
+  ```
+
+- View Python Edge AI service logs:
+
+  ```powershell
+  cd docker
+  docker compose logs -f python-edge
+  ```
+
 ## Notes
 
 - If a container does not start, check logs with `docker compose logs <service-name>`.
