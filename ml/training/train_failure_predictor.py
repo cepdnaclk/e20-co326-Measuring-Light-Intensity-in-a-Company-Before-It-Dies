@@ -45,7 +45,7 @@ from xgboost import XGBClassifier
 # ---------------------------------------------------------------------------
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_CSV = os.path.join(SCRIPT_DIR, "data", "synthetic_degradation_data.csv")
-OUTPUT_DIR = os.path.join(SCRIPT_DIR, "..", "..", "python", "models")
+OUTPUT_DIR = os.path.normpath(os.path.join(SCRIPT_DIR, "..", "..", "python", "models"))
 MODEL_PATH = os.path.join(OUTPUT_DIR, "failure_predictor.joblib")
 
 RANDOM_STATE = 42
@@ -196,14 +196,14 @@ def main():
     # -----------------------------------------------------------------------
     # 1. Load data
     # -----------------------------------------------------------------------
-    print("Loading synthetic degradation data …")
+    print("Loading synthetic degradation data ...")
     df = pd.read_csv(DATA_CSV)
     print(f"  {len(df)} rows loaded.")
 
     # -----------------------------------------------------------------------
     # 2. Feature engineering
     # -----------------------------------------------------------------------
-    print("Engineering features …")
+    print("Engineering features ...")
     df = engineer_features(df)
 
     # -----------------------------------------------------------------------
@@ -238,10 +238,10 @@ def main():
         "windows": list(WINDOWS.keys()),
     }
     joblib.dump(artifact, MODEL_PATH)
-    print(f"\nAll models saved → {MODEL_PATH}")
+    print(f"\nAll models saved -> {MODEL_PATH}")
     for name, info in models.items():
         print(f"  {name}: AUC-ROC = {info['auc']:.4f}")
-    print("✓ Done.")
+    print("Done.")
 
 
 if __name__ == "__main__":

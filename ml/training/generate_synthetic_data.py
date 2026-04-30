@@ -216,7 +216,7 @@ def main():
         bulb_rows = simulate_bulb(f"bulb_{i:04d}")
         all_rows.extend(bulb_rows)
         if (i + 1) % 200 == 0:
-            print(f"  Simulated {i + 1}/{NUM_BULBS} bulbs …")
+            print(f"  Simulated {i + 1}/{NUM_BULBS} bulbs ...")
 
     # Shuffle rows
     random.shuffle(all_rows)
@@ -231,7 +231,7 @@ def main():
     fail_14d = sum(1 for r in all_rows if r[-1] == 1)
     fail_7d = sum(1 for r in all_rows if r[-2] == 1)
     fail_3d = sum(1 for r in all_rows if r[-3] == 1)
-    print(f"\nGenerated {total} samples → {OUTPUT_CSV}")
+    print(f"\nGenerated {total} samples -> {OUTPUT_CSV}")
     print(f"  Will fail in 14d: {fail_14d} ({100*fail_14d/total:.1f}%)")
     print(f"  Will fail in 7d:  {fail_7d} ({100*fail_7d/total:.1f}%)")
     print(f"  Will fail in 3d:  {fail_3d} ({100*fail_3d/total:.1f}%)")

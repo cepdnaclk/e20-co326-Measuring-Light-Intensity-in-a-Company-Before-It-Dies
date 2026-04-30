@@ -7,18 +7,18 @@ ready for deployment on an ESP32 via EloquentTinyML.
 
 Model architecture
 ------------------
-    Input(6) → Dense(16, ReLU) → Dense(8, ReLU) → Dense(3, Softmax)
+    Input(6) -> Dense(16, ReLU) -> Dense(8, ReLU) -> Dense(3, Softmax)
 
 The model is intentionally tiny (~2 KB after int8 quantisation) so it
 fits comfortably in the ESP32's flash and SRAM.
 
 Input features (computed from a 20-sample sliding window of LDR readings):
-    0  ldr_norm          – current LDR reading normalised to 0..1
-    1  avg_norm          – window moving-average normalised to 0..1
-    2  rate_of_change    – (newest − oldest) / ADC_MAX
-    3  variance          – normalised variance of the window
-    4  min_norm          – minimum reading in window / ADC_MAX
-    5  max_norm          – maximum reading in window / ADC_MAX
+    0  ldr_norm          - current LDR reading normalised to 0..1
+    1  avg_norm          - window moving-average normalised to 0..1
+    2  rate_of_change    - (newest - oldest) / ADC_MAX
+    3  variance          - normalised variance of the window
+    4  min_norm          - minimum reading in window / ADC_MAX
+    5  max_norm          - maximum reading in window / ADC_MAX
 
 Output classes:
     0 = HEALTHY
@@ -27,17 +27,18 @@ Output classes:
 
 Usage
 -----
-    python train_tinyml_classifier.py
+    C:\\ml_venv\\Scripts\\python.exe train_tinyml_classifier.py
 
 Prerequisites
 -------------
-    pip install tensorflow numpy pandas scikit-learn
+    TensorFlow, numpy, pandas, scikit-learn  (install in the venv)
 
 Outputs
 -------
-    ml/training/models/tinyml_classifier.keras   – saved Keras model
-    ml/training/models/bulb_model.tflite          – quantised TFLite model
-    ml/training/models/bulb_model.h               – C header for Arduino
+    ml/training/models/tinyml_classifier.keras   - saved Keras model
+    ml/training/models/bulb_model.tflite         - quantised TFLite model
+    ml/training/models/bulb_model.h              - C header for Arduino
+    edge-logic/firmware/light_monitor/bulb_model.h - copy for firmware
 """
 
 import os
@@ -86,8 +87,8 @@ def build_model() -> tf.keras.Model:
     Build the tiny classifier.
 
     Architecture chosen to be small enough for ESP32:
-        Dense(16) → Dense(8) → Dense(3)
-    Total params ≈ 200  →  ~2 KB after int8 quantisation.
+        Dense(16) -> Dense(8) -> Dense(3)
+    Total params ~ 200  ->  ~2 KB after int8 quantisation.
     """
     model = tf.keras.Sequential([
         tf.keras.layers.Input(shape=(NUM_FEATURES,)),
@@ -166,7 +167,7 @@ def main():
     # -----------------------------------------------------------------------
     # 1. Load data
     # -----------------------------------------------------------------------
-    print("Loading training data …")
+    print("Loading training data ...")
     X, y = load_data()
     print(f"  Samples: {len(X)}  |  Features: {X.shape[1]}")
 
@@ -181,7 +182,7 @@ def main():
     # -----------------------------------------------------------------------
     # 3. Build and train model
     # -----------------------------------------------------------------------
-    print("\nTraining model …")
+    print("\nTraining model ...")
     model = build_model()
     model.summary()
 
@@ -210,32 +211,33 @@ def main():
     # 5. Save Keras model
     # -----------------------------------------------------------------------
     model.save(KERAS_PATH)
-    print(f"\nKeras model saved → {KERAS_PATH}")
+    print(f"\nKeras model saved -> {KERAS_PATH}")
 
     # -----------------------------------------------------------------------
     # 6. Convert to TFLite (int8 quantised)
     # -----------------------------------------------------------------------
-    print("Converting to TFLite (int8) …")
+    print("Converting to TFLite (int8) ...")
     tflite_model = convert_to_tflite(model, X_train)
     with open(TFLITE_PATH, "wb") as f:
         f.write(tflite_model)
-    print(f"  TFLite model: {len(tflite_model)} bytes → {TFLITE_PATH}")
+    print(f"  TFLite model: {len(tflite_model)} bytes -> {TFLITE_PATH}")
 
     # -----------------------------------------------------------------------
     # 7. Export C header for Arduino / EloquentTinyML
     # -----------------------------------------------------------------------
     export_c_header(tflite_model, HEADER_PATH)
-    print(f"  C header     → {HEADER_PATH}")
+    print(f"  C header -> {HEADER_PATH}")
 
     # Also copy header to the firmware directory for convenience
     firmware_header = os.path.join(
         SCRIPT_DIR, "..", "..", "edge-logic", "firmware",
         "light_monitor", "bulb_model.h",
     )
+    os.makedirs(os.path.dirname(firmware_header), exist_ok=True)
     export_c_header(tflite_model, firmware_header)
-    print(f"  C header     → {firmware_header}")
+    print(f"  C header -> {firmware_header}")
 
-    print("\n✓ Done.  Model is ready for ESP32 deployment.")
+    print("\nDone. Model is ready for ESP32 deployment.")
 
 
 if __name__ == "__main__":

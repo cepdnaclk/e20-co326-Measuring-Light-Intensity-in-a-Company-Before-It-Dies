@@ -13,21 +13,21 @@
  *   - Relay module on GPIO 26 (for backup light switching)
  *
  * ML Model:
- *   - Architecture: Dense(16,ReLU) → Dense(8,ReLU) → Dense(3,Softmax)
+ *   - Architecture: Dense(16,ReLU) -> Dense(8,ReLU) -> Dense(3,Softmax)
  *   - Input (6 floats): ldr_norm, avg_norm, rate_of_change,
  *                        variance, min_norm, max_norm
  *   - Output (3 floats): P(HEALTHY), P(DEGRADING), P(FAILED)
  *   - Size: ~2 KB (int8 quantised TFLite)
  *
  * MQTT Topics Published:
- *   factory/light/ldr           → raw LDR ADC value (int)
- *   factory/light/edge-ai       → JSON: {status, confidence, scores,
- *                                         sudden_failure, ldr}
+ *   factory/light/ldr           - raw LDR ADC value (int)
+ *   factory/light/edge-ai       - JSON: {status, confidence, scores,
+ *                                        sudden_failure, ldr}
  *
  * Libraries Required (install via Arduino Library Manager):
- *   - EloquentTinyML   (TFLite Micro wrapper)
- *   - PubSubClient      (MQTT)
- *   - WiFi               (built-in ESP32)
+ *   - EloquentTinyML  (TFLite Micro wrapper)
+ *   - PubSubClient    (MQTT)
+ *   - WiFi            (built-in ESP32)
  *
  * Author: LED Luminaire Monitor Team
  * Date:   April 2026
@@ -105,7 +105,7 @@ void setupWifi()
         Serial.print(".");
     }
     Serial.println();
-    Serial.print("WiFi connected — IP: ");
+    Serial.print("WiFi connected - IP: ");
     Serial.println(WiFi.localIP());
 }
 
@@ -116,7 +116,7 @@ void reconnectMqtt()
 {
     while (!mqttClient.connected())
     {
-        Serial.print("Connecting to MQTT … ");
+        Serial.print("Connecting to MQTT ... ");
         if (mqttClient.connect("LightMonitorESP32"))
         {
             Serial.println("connected.");
@@ -125,7 +125,7 @@ void reconnectMqtt()
         {
             Serial.print("failed (rc=");
             Serial.print(mqttClient.state());
-            Serial.println("). Retrying in 2 s …");
+            Serial.println("). Retrying in 2s...");
             delay(2000);
         }
     }
@@ -139,12 +139,12 @@ void reconnectMqtt()
  * Compute the 6 normalised features that the TinyML model expects.
  *
  * Features:
- *   [0] ldr_norm        – current reading / ADC_MAX
- *   [1] avg_norm        – window mean / ADC_MAX
- *   [2] rate_of_change  – (newest − oldest) / ADC_MAX
- *   [3] variance        – normalised variance of the window
- *   [4] min_norm        – min(window) / ADC_MAX
- *   [5] max_norm        – max(window) / ADC_MAX
+ *   [0] ldr_norm        - current reading / ADC_MAX
+ *   [1] avg_norm        - window mean / ADC_MAX
+ *   [2] rate_of_change  - (newest - oldest) / ADC_MAX
+ *   [3] variance        - normalised variance of the window
+ *   [4] min_norm        - min(window) / ADC_MAX
+ *   [5] max_norm        - max(window) / ADC_MAX
  */
 void extractFeatures(float features[NUM_INPUTS])
 {
@@ -191,8 +191,8 @@ void extractFeatures(float features[NUM_INPUTS])
 
 /**
  * Check if the latest LDR reading is an anomaly compared to the
- * sliding window.  Uses Z-score: if |value − mean| > 3σ the reading
- * is flagged as a sudden failure.
+ * sliding window.  Uses Z-score: if |value - mean| > 3 sigma the
+ * reading is flagged as a sudden failure.
  *
  * Returns true if a sudden failure is detected.
  */
@@ -311,7 +311,7 @@ void loop()
         float features[NUM_INPUTS];
         extractFeatures(features);
 
-        // Run inference — populates output[] with probabilities
+        // Run inference - populates output[] with probabilities
         ml.predict(features, output);
 
         // Find class with highest probability
@@ -334,12 +334,12 @@ void loop()
     // Turn ON backup light if bulb is DEGRADING or FAILED
     if (predictedClass == 0)
     {
-        // HEALTHY — no backup needed
+        // HEALTHY - no backup needed
         digitalWrite(RELAY_PIN, HIGH);
     }
     else
     {
-        // DEGRADING or FAILED — activate backup light
+        // DEGRADING or FAILED - activate backup light
         digitalWrite(RELAY_PIN, LOW);
     }
 

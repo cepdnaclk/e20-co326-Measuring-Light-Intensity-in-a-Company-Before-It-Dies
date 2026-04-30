@@ -50,12 +50,12 @@ from xgboost import XGBClassifier
 # Paths
 # ---------------------------------------------------------------------------
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATASET_PATH = os.path.join(
+DATASET_PATH = os.path.normpath(os.path.join(
     SCRIPT_DIR, "..", "models",
     "Street Light Fault Prediction Dataset",
     "street_light_fault_prediction_dataset.csv",
-)
-OUTPUT_DIR = os.path.join(SCRIPT_DIR, "..", "..", "python", "models")
+))
+OUTPUT_DIR = os.path.normpath(os.path.join(SCRIPT_DIR, "..", "..", "python", "models"))
 MODEL_PATH = os.path.join(OUTPUT_DIR, "fault_classifier.joblib")
 
 # ---------------------------------------------------------------------------
@@ -173,7 +173,7 @@ def main():
     # -----------------------------------------------------------------------
     # 3. Train
     # -----------------------------------------------------------------------
-    print("Training XGBoost fault classifier …")
+    print("Training XGBoost fault classifier ...")
     model = train_model(X_train, y_train)
 
     # -----------------------------------------------------------------------
@@ -190,9 +190,9 @@ def main():
         "fault_labels": FAULT_LABELS,
     }
     joblib.dump(artifact, MODEL_PATH)
-    print(f"\nModel saved → {MODEL_PATH}")
+    print(f"\nModel saved -> {MODEL_PATH}")
     print(f"Accuracy: {accuracy:.4f}")
-    print("✓ Done.")
+    print("Done.")
 
 
 if __name__ == "__main__":

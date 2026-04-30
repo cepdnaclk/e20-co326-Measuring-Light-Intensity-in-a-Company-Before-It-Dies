@@ -196,7 +196,7 @@ def main():
     for i in range(NUM_LIFECYCLES):
         all_rows.extend(simulate_lifecycle())
         if (i + 1) % 100 == 0:
-            print(f"  Simulated {i + 1}/{NUM_LIFECYCLES} lifecycles …")
+            print(f"  Simulated {i + 1}/{NUM_LIFECYCLES} lifecycles ...")
 
     # Shuffle so labels are not grouped by lifecycle
     random.shuffle(all_rows)
@@ -211,7 +211,7 @@ def main():
     for row in all_rows:
         counts[row[-1]] += 1
 
-    print(f"\nGenerated {len(all_rows)} samples → {OUTPUT_CSV}")
+    print(f"\nGenerated {len(all_rows)} samples -> {OUTPUT_CSV}")
     print(f"  HEALTHY   (0): {counts[0]}")
     print(f"  DEGRADING (1): {counts[1]}")
     print(f"  FAILED    (2): {counts[2]}")
